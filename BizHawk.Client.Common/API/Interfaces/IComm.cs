@@ -1,6 +1,6 @@
 ﻿namespace BizHawk.Client.ApiHawk
 {
-	public interface IComm : IExternalApi
+	public interface IComm : IExternalAPI
 	{
 		#region Sockets
 		string SocketServerScreenShot();

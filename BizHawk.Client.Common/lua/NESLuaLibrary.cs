@@ -11,13 +11,13 @@ using BizHawk.Emulation.Cores.Consoles.Nintendo.QuickNES;
 namespace BizHawk.Client.Common
 {
 	[Description("Functions related specifically to Nes Cores")]
-	public sealed class NesLuaLibrary : LuaLibraryBase
+	public sealed class NESLuaLibrary : LuaLibraryBase
 	{
 		// TODO:  
 		// perhaps with the new core config system, one could
 		// automatically bring out all of the settings to a lua table, with names.  that
 		// would be completely arbitrary and would remove the whole requirement for this mess
-		public NesLuaLibrary(Lua lua)
+		public NESLuaLibrary(Lua lua)
 			: base(lua) { }
 
 		[OptionalService]
@@ -33,7 +33,7 @@ namespace BizHawk.Client.Common
 
 		private bool HasMemoryDOmains => MemoryDomains != null;
 
-		public NesLuaLibrary(Lua lua, Action<string> logOutputCallback)
+		public NESLuaLibrary(Lua lua, Action<string> logOutputCallback)
 			: base(lua, logOutputCallback) { }
 
 		public override string Name => "nes";

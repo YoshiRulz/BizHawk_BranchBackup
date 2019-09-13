@@ -4,12 +4,12 @@ using NLua;
 
 namespace BizHawk.Client.Common
 {
-	public sealed class MovieLuaLibrary : LuaLibraryBase
+	public sealed class InputMovieLuaLibrary : LuaLibraryBase
 	{
-		public MovieLuaLibrary(Lua lua)
+		public InputMovieLuaLibrary(Lua lua)
 			: base(lua) { }
 
-		public MovieLuaLibrary(Lua lua, Action<string> logOutputCallback)
+		public InputMovieLuaLibrary(Lua lua, Action<string> logOutputCallback)
 			: base(lua, logOutputCallback) { }
 
 		public override string Name => "movie";

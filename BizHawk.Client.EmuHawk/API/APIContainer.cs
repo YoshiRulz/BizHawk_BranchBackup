@@ -7,24 +7,24 @@ using BizHawk.Client.ApiHawk;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public sealed class ApiContainer : IApiContainer
+	public sealed class APIContainer : IAPIContainer
 	{
-		public IComm Comm => (IComm)Libraries[typeof(CommApi)];
-		public IEmu Emu => (IEmu)Libraries[typeof(EmuApi)];
-		public IGameInfo GameInfo => (IGameInfo)Libraries[typeof(GameInfoApi)];
-		public IGui Gui => (IGui)Libraries[typeof(GuiApi)];
-		public IInput Input => (IInput)Libraries[typeof(InputApi)];
-		public IJoypad Joypad => (IJoypad)Libraries[typeof(JoypadApi)];
-		public IMem Mem => (IMem)Libraries[typeof(MemApi)];
-		public IMemEvents MemEvents => (IMemEvents)Libraries[typeof(MemEventsApi)];
-		public IMemorySaveState MemorySaveState => (IMemorySaveState)Libraries[typeof(MemorySaveStateApi)];
-		public IMovie Movie => (IMovie)Libraries[typeof(MovieApi)];
-		public ISaveState SaveState => (ISaveState)Libraries[typeof(SaveStateApi)];
-		public ISql Sql => (ISql)Libraries[typeof(SqlApi)];
-		public ITool Tool => (ITool)Libraries[typeof(ToolApi)];
-		public IUserData UserData => (IUserData)Libraries[typeof(UserDataApi)];
-		public Dictionary<Type, IExternalApi> Libraries { get; set; }
-		public ApiContainer(Dictionary<Type, IExternalApi> libs)
+		public IComm Comm => (IComm)Libraries[typeof(CommAPI)];
+		public IEmu Emu => (IEmu)Libraries[typeof(EmuAPI)];
+		public IGameInfo GameInfo => (IGameInfo)Libraries[typeof(GameInfoAPI)];
+		public IGUI Gui => (IGUI)Libraries[typeof(GUIAPI)];
+		public IInput Input => (IInput)Libraries[typeof(InputAPI)];
+		public IJoypad Joypad => (IJoypad)Libraries[typeof(JoypadAPI)];
+		public IMem Mem => (IMem)Libraries[typeof(MemAPI)];
+		public IMemEvents MemEvents => (IMemEvents)Libraries[typeof(MemEventsAPI)];
+		public IMemorySaveState MemorySaveState => (IMemorySaveState)Libraries[typeof(MemorySaveStateAPI)];
+		public IInputMovie Movie => (IInputMovie)Libraries[typeof(InputMovieAPI)];
+		public ISaveState SaveState => (ISaveState)Libraries[typeof(SaveStateAPI)];
+		public ISQLite Sql => (ISQLite)Libraries[typeof(SQLiteAPI)];
+		public ITool Tool => (ITool)Libraries[typeof(ToolAPI)];
+		public IUserData UserData => (IUserData)Libraries[typeof(UserDataAPI)];
+		public Dictionary<Type, IExternalAPI> Libraries { get; set; }
+		public APIContainer(Dictionary<Type, IExternalAPI> libs)
 		{
 			Libraries = libs;
 		}

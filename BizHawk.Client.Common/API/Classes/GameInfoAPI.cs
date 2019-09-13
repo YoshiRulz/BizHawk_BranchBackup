@@ -5,12 +5,12 @@ using BizHawk.Emulation.Common;
 
 namespace BizHawk.Client.ApiHawk
 {
-	public sealed class GameInfoApi : IGameInfo
+	public sealed class GameInfoAPI : IGameInfo
 	{
 		[OptionalService]
 		private IBoardInfo BoardInfo { get; set; }
 
-		public GameInfoApi()
+		public GameInfoAPI()
 		{ }
 
 		public string GetRomName()

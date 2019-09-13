@@ -5,12 +5,12 @@ using BizHawk.Emulation.Common.IEmulatorExtensions;
 
 namespace BizHawk.Client.ApiHawk
 {
-	public sealed class MemEventsApi : IMemEvents
+	public sealed class MemEventsAPI : IMemEvents
 	{
 		[RequiredService]
 		private IDebuggable DebuggableCore { get; set; }
 
-		public MemEventsApi () : base()
+		public MemEventsAPI () : base()
 		{ }
 
 		public void AddReadCallback(MemoryCallbackDelegate cb, uint? address, string domain)

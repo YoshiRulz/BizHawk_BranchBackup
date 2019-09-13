@@ -5,9 +5,9 @@ using BizHawk.Client.Common;
 
 namespace BizHawk.Client.ApiHawk
 {
-	public sealed class JoypadApi : IJoypad
+	public sealed class JoypadAPI : IJoypad
 	{
-		public JoypadApi()
+		public JoypadAPI()
 		{ }
 
 		public Dictionary<string,dynamic> Get(int? controller = null)

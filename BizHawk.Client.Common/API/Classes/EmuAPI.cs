@@ -16,7 +16,7 @@ using BizHawk.Emulation.Cores.Consoles.Nintendo.QuickNES;
 namespace BizHawk.Client.ApiHawk
 {
 	[Description("A library for interacting with the currently loaded emulator core")]
-	public sealed class EmuApi : IEmu
+	public sealed class EmuAPI : IEmu
 	{
 		private static class EmuStatic
 		{
@@ -63,7 +63,7 @@ namespace BizHawk.Client.ApiHawk
 		public Action FrameAdvanceCallback { get; set; }
 		public Action YieldCallback { get; set; }
 
-		public EmuApi()
+		public EmuAPI()
 		{ }
 
 		public void DisplayVsync(bool enabled)

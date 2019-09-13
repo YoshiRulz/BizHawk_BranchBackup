@@ -2,7 +2,7 @@
 
 namespace BizHawk.Client.ApiHawk
 {
-	public interface IGameInfo : IExternalApi
+	public interface IGameInfo : IExternalAPI
 	{
 		string GetRomName();
 		string GetRomHash();

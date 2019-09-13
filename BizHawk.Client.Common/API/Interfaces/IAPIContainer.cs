@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace BizHawk.Client.ApiHawk
 {
-	public interface IApiContainer
+	public interface IAPIContainer
 	{
-		Dictionary<Type, IExternalApi> Libraries { get; set; }
+		Dictionary<Type, IExternalAPI> Libraries { get; set; }
 	}
 }

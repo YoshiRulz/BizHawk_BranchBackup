@@ -1,6 +1,6 @@
 ﻿namespace BizHawk.Client.ApiHawk
 {
-	public interface ISql : IExternalApi
+	public interface ISQLite : IExternalAPI
 	{
 		string CreateDatabase(string name);
 		string OpenDatabase(string name);

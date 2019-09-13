@@ -1,7 +1,7 @@
 ﻿using System;
 namespace BizHawk.Client.ApiHawk
 {
-	public interface ITool : IExternalApi
+	public interface ITool : IExternalAPI
 	{
 		Type GetTool(string name);
 		object CreateInstance(string name);

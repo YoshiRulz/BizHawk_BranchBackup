@@ -1,6 +1,6 @@
 ﻿namespace BizHawk.Client.ApiHawk
 {
-	public interface IUserData : IExternalApi
+	public interface IUserData : IExternalAPI
 	{
 		void Set(string name, object value);
 		object Get(string key);

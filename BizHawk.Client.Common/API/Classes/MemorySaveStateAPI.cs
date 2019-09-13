@@ -6,9 +6,9 @@ using BizHawk.Emulation.Common;
 
 namespace BizHawk.Client.ApiHawk
 {
-	public sealed class MemorySaveStateApi : IMemorySaveState
+	public sealed class MemorySaveStateAPI : IMemorySaveState
 	{
-		public MemorySaveStateApi()
+		public MemorySaveStateAPI()
 		{ }
 
 		[RequiredService]

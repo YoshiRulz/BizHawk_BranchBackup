@@ -7,11 +7,11 @@ using BizHawk.Common.BufferExtensions;
 
 namespace BizHawk.Client.ApiHawk
 {
-	public sealed class MemApi : MemApiBase, IMem
+	public sealed class MemAPI : MemAPIBase, IMem
 	{
 		private MemoryDomain _currentMemoryDomain;
 		private bool _isBigEndian = false;
-		public MemApi()
+		public MemAPI()
 			: base()
 		{
 		}

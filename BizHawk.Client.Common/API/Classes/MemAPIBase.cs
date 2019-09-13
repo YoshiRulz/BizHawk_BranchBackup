@@ -8,7 +8,7 @@ namespace BizHawk.Client.ApiHawk
 	/// <summary>
 	/// Base class for the Memory and MainMemory plugin libraries
 	/// </summary>
-	public abstract class MemApiBase : IExternalApi
+	public abstract class MemAPIBase : IExternalAPI
 	{
 		[RequiredService]
 		protected IEmulator Emulator { get; set; }
@@ -18,7 +18,7 @@ namespace BizHawk.Client.ApiHawk
 
 		protected abstract MemoryDomain Domain { get; }
 
-		protected MemApiBase()
+		protected MemAPIBase()
 		{ }
 
 		protected IMemoryDomains DomainList

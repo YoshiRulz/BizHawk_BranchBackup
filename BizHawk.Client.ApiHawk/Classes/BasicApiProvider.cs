@@ -5,7 +5,7 @@ using System.Linq;
 namespace BizHawk.Client.ApiHawk
 {
 	/// <summary>
-	/// A generic implementation of IExternalApi provider that provides
+	/// A generic implementation of IExternalAPI provider that provides
 	/// this functionality to any core.
 	/// The provider will scan an IExternal and register all IExternalApis
 	/// that the core object itself implements.  In addition it provides
@@ -14,15 +14,15 @@ namespace BizHawk.Client.ApiHawk
 	/// <seealso cref="IExternalApiProvider"/> 
 	public class BasicApiProvider : IExternalApiProvider
 	{
-		private readonly Dictionary<Type, IExternalApi> _Apis = new Dictionary<Type, IExternalApi>();
+		private readonly Dictionary<Type, IExternalAPI> _Apis = new Dictionary<Type, IExternalAPI>();
 
-		public BasicApiProvider(IApiContainer container)
+		public BasicApiProvider(IAPIContainer container)
 		{
 			// simplified logic here doesn't scan for possible Apis; just adds what it knows is implemented by the PluginApi
 			// this removes the possibility of automagically picking up a Api in a nested class, (find the type, then
 			// find the field), but we're going to keep such logic out of the basic provider.  Anything the passed
 			// container doesn't implement directly needs to be added with Register()
-			// this also fully allows apis that are not IExternalApi
+			// this also fully allows apis that are not IExternalAPI
 			var libs = container.Libraries;
 
 			_Apis = libs;
@@ -31,9 +31,9 @@ namespace BizHawk.Client.ApiHawk
 		/// <summary>
 		/// the client can call this to register an additional Api
 		/// </summary>
-		/// <typeparam name="T">The <seealso cref="IExternalApi"/> to register</typeparam>
+		/// <typeparam name="T">The <seealso cref="IExternalAPI"/> to register</typeparam>
 		public void Register<T>(T api)
-			where T : IExternalApi
+			where T : IExternalAPI
 		{
 			if (api == null)
 			{
@@ -44,15 +44,15 @@ namespace BizHawk.Client.ApiHawk
 		}
 
 		public T GetApi<T>()
-			where T : IExternalApi
+			where T : IExternalAPI
 		{
 			return (T)GetApi(typeof(T));
 		}
 
 		public object GetApi(Type t)
 		{
-			IExternalApi Api;
-			KeyValuePair<Type, IExternalApi>[] k = _Apis.Where(kvp => t.IsAssignableFrom(kvp.Key)).ToArray();
+			IExternalAPI Api;
+			KeyValuePair<Type, IExternalAPI>[] k = _Apis.Where(kvp => t.IsAssignableFrom(kvp.Key)).ToArray();
 			if (k.Length > 0)
 			{
 				return k[0].Value;
@@ -62,7 +62,7 @@ namespace BizHawk.Client.ApiHawk
 		}
 
 		public bool HasApi<T>()
-			where T : IExternalApi
+			where T : IExternalAPI
 		{
 			return HasApi(typeof(T));
 		}

@@ -1,6 +1,6 @@
 ﻿namespace BizHawk.Client.ApiHawk
 {
-	public interface IMemorySaveState : IExternalApi
+	public interface IMemorySaveState : IExternalAPI
 	{
 		string SaveCoreStateToMemory();
 		void LoadCoreStateFromMemory(string identifier);

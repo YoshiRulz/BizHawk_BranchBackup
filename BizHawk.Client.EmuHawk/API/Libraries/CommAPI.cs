@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public sealed class CommApi : IComm
+	public sealed class CommAPI : IComm
 	{
 		[RequiredService]
 		private IEmulator Emulator { get; set; }
@@ -19,7 +19,7 @@ namespace BizHawk.Client.EmuHawk
 		[RequiredService]
 		private IVideoProvider VideoProvider { get; set; }
 
-		public CommApi() : base()
+		public CommAPI() : base()
 		{ }
 
 		public string SocketServerScreenShot()

@@ -10,7 +10,7 @@ using BizHawk.Emulation.Common;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public sealed class GuiApi : IGui
+	public sealed class GUIAPI : IGUI
 	{
 		[RequiredService]
 		private IEmulator Emulator { get; set; }
@@ -23,7 +23,7 @@ namespace BizHawk.Client.EmuHawk
 		private System.Drawing.Drawing2D.CompositingMode _compositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
 
 
-		public GuiApi()
+		public GUIAPI()
 		{ }
 
 		private DisplaySurface _GUISurface = null;

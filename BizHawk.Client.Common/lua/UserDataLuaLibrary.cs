@@ -8,12 +8,12 @@ using BizHawk.Client.Common;
 namespace BizHawk.Client.EmuHawk
 {
 	[Description("A library for setting and retrieving dynamic data that will be saved and loaded with savestates")]
-	public sealed class UserDataLibrary : LuaLibraryBase
+	public sealed class UserDataLuaLibrary : LuaLibraryBase
 	{
-		public UserDataLibrary(Lua lua)
+		public UserDataLuaLibrary(Lua lua)
 			: base(lua) { }
 
-		public UserDataLibrary(Lua lua, Action<string> logOutputCallback)
+		public UserDataLuaLibrary(Lua lua, Action<string> logOutputCallback)
 			: base(lua, logOutputCallback) { }
 
 		public override string Name => "userdata";

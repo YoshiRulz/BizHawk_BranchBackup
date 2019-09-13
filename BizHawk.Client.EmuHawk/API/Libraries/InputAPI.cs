@@ -8,9 +8,9 @@ using BizHawk.Client.Common;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public sealed class InputApi : IInput
+	public sealed class InputAPI : IInput
 	{
-		public InputApi() : base()
+		public InputAPI() : base()
 		{ }
 
 		public Dictionary<string,bool> Get()

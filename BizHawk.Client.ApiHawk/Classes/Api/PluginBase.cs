@@ -13,7 +13,7 @@ namespace BizHawk.Client.ApiHawk
 		/// or register memory callbacks in
 		/// their Init function.
 		/// </summary>
-		protected IApiContainer _api;
+		protected IAPIContainer _api;
 
 		public PluginBase()	{ }
 
@@ -41,7 +41,7 @@ namespace BizHawk.Client.ApiHawk
 		public virtual void LoadStateCallback(string name) { }
 		public virtual void InputPollCallback() { }
 		public virtual void ExitCallback() { }
-		public virtual void Init (IApiContainer api)
+		public virtual void Init (IAPIContainer api)
 		{
 			_api = api;
 			Running = true;

@@ -5,9 +5,9 @@ using BizHawk.Client.Common;
 
 namespace BizHawk.Client.ApiHawk
 {
-	public sealed class UserDataApi : IUserData
+	public sealed class UserDataAPI : IUserData
 	{
-		public UserDataApi() : base()
+		public UserDataAPI() : base()
 		{ }
 
 		public void Set(string name, object value)

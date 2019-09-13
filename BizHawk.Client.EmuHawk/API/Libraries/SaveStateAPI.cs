@@ -6,9 +6,9 @@ using BizHawk.Client.ApiHawk;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public sealed class SaveStateApi : ISaveState
+	public sealed class SaveStateAPI : ISaveState
 	{
-		public SaveStateApi() : base()
+		public SaveStateAPI() : base()
 		{ }
 
 		public void Load(string path)

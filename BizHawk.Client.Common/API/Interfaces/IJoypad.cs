@@ -2,7 +2,7 @@
 
 namespace BizHawk.Client.ApiHawk
 {
-	public interface IJoypad : IExternalApi
+	public interface IJoypad : IExternalAPI
 	{
 		Dictionary<string, dynamic> Get(int? controller = null);
 

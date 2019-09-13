@@ -9,7 +9,7 @@ using BizHawk.Client.Common;
 
 namespace BizHawk.Client.EmuHawk
 {
-	public sealed class ToolApi : ITool
+	public sealed class ToolAPI : ITool
 	{
 		private class ToolStatic
 		{
@@ -88,7 +88,7 @@ namespace BizHawk.Client.EmuHawk
 		[RequiredService]
 		private static IVideoProvider VideoProvider { get; set; }
 
-		public ToolApi()
+		public ToolAPI()
 		{ }
 
 		public Type GetTool(string name)

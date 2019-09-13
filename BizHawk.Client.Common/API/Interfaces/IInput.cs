@@ -2,7 +2,7 @@
 
 namespace BizHawk.Client.ApiHawk
 {
-	public interface IInput : IExternalApi
+	public interface IInput : IExternalAPI
 	{
 		Dictionary<string, bool> Get();
 		Dictionary<string, dynamic> GetMouse();

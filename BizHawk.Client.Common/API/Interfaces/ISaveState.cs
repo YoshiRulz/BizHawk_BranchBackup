@@ -1,6 +1,6 @@
 ﻿namespace BizHawk.Client.ApiHawk
 {
-	public interface ISaveState : IExternalApi
+	public interface ISaveState : IExternalAPI
 	{
 		void Load(string path);
 		void LoadSlot(int slotNum);

@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace BizHawk.Client.ApiHawk
 {
-	public interface IGui : IExternalApi
+	public interface IGUI : IExternalAPI
 	{
 		#region Gui API
 		void ToggleCompositingMode();

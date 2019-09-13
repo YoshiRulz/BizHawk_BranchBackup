@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BizHawk.Client.ApiHawk
 {
-	public interface IEmu : IExternalApi
+	public interface IEmu : IExternalAPI
 	{
 		Action FrameAdvanceCallback { get; set; }
 		Action YieldCallback { get; set; }

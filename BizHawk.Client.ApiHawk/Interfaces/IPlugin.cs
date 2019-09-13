@@ -7,6 +7,6 @@
 		void SaveStateCallback(string name);
 		void LoadStateCallback(string name);
 		void InputPollCallback();
-		void Init(IApiContainer api);
+		void Init(IAPIContainer api);
 	}
 }

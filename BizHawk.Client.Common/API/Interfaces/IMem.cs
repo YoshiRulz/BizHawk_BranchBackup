@@ -2,7 +2,7 @@
 
 namespace BizHawk.Client.ApiHawk
 {
-	public interface IMem : IExternalApi
+	public interface IMem : IExternalAPI
 	{
 		void SetBigEndian(bool enabled = true);
 
