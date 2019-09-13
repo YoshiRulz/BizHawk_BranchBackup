@@ -115,5 +115,29 @@ namespace BizHawk.Common.CollectionExtensions
 
 			return bools;
 		}
+
+		/// <param name="this">non-null dict</param>
+		/// <returns>shallow copy of <paramref name="this"/> with values transformed by <paramref name="valueMapFunc"/></returns>
+		public static Dictionary<K, V1> MapValues<K, V, V1>(this IDictionary<K, V> @this, Func<V, V1> valueMapFunc)
+		{
+			var copy = new Dictionary<K, V1>();
+			foreach (var kvp in @this)
+				copy[kvp.Key] = valueMapFunc(kvp.Value);
+			return copy;
+		}
+
+		/// <param name="this">non-null list</param>
+		/// <returns>shallow copy of <paramref name="this"/></returns>
+		public static List<E> ShallowCopy<E>(this IList<E> @this) => @this.ToList();
+
+		/// <param name="this">non-null dict</param>
+		/// <returns>shallow copy of <paramref name="this"/></returns>
+		public static Dictionary<K, V> ShallowCopy<K, V>(this IDictionary<K, V> @this)
+		{
+			var copy = new Dictionary<K, V>();
+			foreach (var kvp in @this)
+				copy[kvp.Key] = kvp.Value;
+			return copy;
+		}
 	}
 }

@@ -114,7 +114,36 @@
     <Compile Include="7z\SevenZipExtractorAsynchronous.cs" />
     <Compile Include="7z\SevenZipSfx.cs" />
     <Compile Include="7z\StreamWrappers.cs" />
+    <Compile Include="Api\ApiSubsetContainer.cs" />
+    <Compile Include="Api\Classes\EmuApi.cs" />
+    <Compile Include="Api\Classes\GameInfoApi.cs" />
+    <Compile Include="Api\Classes\JoypadApi.cs" />
+    <Compile Include="Api\Classes\MemApi.cs" />
+    <Compile Include="Api\Classes\MemApiBase.cs" />
+    <Compile Include="Api\Classes\MemEventsApi.cs" />
+    <Compile Include="Api\Classes\MemorySaveStateApi.cs" />
+    <Compile Include="Api\Classes\MovieApi.cs" />
+    <Compile Include="Api\Classes\PluginBase.cs" />
+    <Compile Include="Api\Classes\SqlApi.cs" />
+    <Compile Include="Api\Classes\UserDataApi.cs" />
     <Compile Include="Api\CoreSystem.cs" />
+    <Compile Include="Api\Interfaces\IApiContainer.cs" />
+    <Compile Include="Api\Interfaces\IComm.cs" />
+    <Compile Include="Api\Interfaces\IEmu.cs" />
+    <Compile Include="Api\Interfaces\IExternalApi.cs" />
+    <Compile Include="Api\Interfaces\IGameInfo.cs" />
+    <Compile Include="Api\Interfaces\IGui.cs" />
+    <Compile Include="Api\Interfaces\IInput.cs" />
+    <Compile Include="Api\Interfaces\IJoypad.cs" />
+    <Compile Include="Api\Interfaces\IMem.cs" />
+    <Compile Include="Api\Interfaces\IMemEvents.cs" />
+    <Compile Include="Api\Interfaces\IMemorySavestate.cs" />
+    <Compile Include="Api\Interfaces\IMovie.cs" />
+    <Compile Include="Api\Interfaces\IPlugin.cs" />
+    <Compile Include="Api\Interfaces\ISaveState.cs" />
+    <Compile Include="Api\Interfaces\ISql.cs" />
+    <Compile Include="Api\Interfaces\ITool.cs" />
+    <Compile Include="Api\Interfaces\IUserData.cs" />
     <Compile Include="Api\JoypadButton.cs" />
     <Compile Include="BinarySaveStates.cs" />
     <Compile Include="BitmapBufferVideoProvider.cs" />
@@ -147,21 +176,7 @@
     <Compile Include="IPS.cs" />
     <Compile Include="IZipWriter.cs" />
     <Compile Include="KeyTurbo.cs" />
-    <Compile Include="lua\EmuLuaLibrary.Bit.cs" />
-    <Compile Include="lua\EmuLuaLibrary.Emu.cs" />
-    <Compile Include="lua\EmuLuaLibrary.Events.cs" />
-    <Compile Include="lua\EmuLuaLibrary.GameInfo.cs" />
-    <Compile Include="lua\EmuLuaLibrary.Genesis.cs" />
-    <Compile Include="lua\EmuLuaLibrary.Joypad.cs" />
-    <Compile Include="lua\EmuLuaLibrary.MainMemory.cs" />
-    <Compile Include="lua\EmuLuaLibrary.Memory.cs" />
-    <Compile Include="lua\EmuLuaLibrary.MemorySavestate.cs" />
-    <Compile Include="lua\EmuLuaLibrary.Movie.cs" />
-    <Compile Include="lua\EmuLuaLibrary.NES.cs" />
-    <Compile Include="lua\EmuLuaLibrary.SNES.cs" />
-    <Compile Include="lua\EmuLuaLibrary.SQL.cs" />
-    <Compile Include="lua\EmuLuaLibrary.String.cs" />
-    <Compile Include="lua\EmuLuaLibrary.UserData.cs" />
+    <Compile Include="lua\DelegatingLuaLibrary.cs" />
     <Compile Include="lua\EnvironmentSandbox.cs" />
     <Compile Include="lua\LuaAttributes.cs" />
     <Compile Include="lua\LuaDocumentation.cs" />
@@ -173,6 +188,21 @@
     <Compile Include="lua\LuaMemoryBase.cs" />
     <Compile Include="lua\LuaSandbox.cs" />
     <Compile Include="lua\NamedLuaFunction.cs" />
+    <Compile Include="lua\uses_apihawk\EmulatorLuaLibrary.cs" />
+    <Compile Include="lua\uses_apihawk\GameInfoLuaLibrary.cs" />
+    <Compile Include="lua\uses_apihawk\JoypadLuaLibrary.cs" />
+    <Compile Include="lua\uses_apihawk\MovieLuaLibrary.cs" />
+    <Compile Include="lua\uses_apihawk\SQLLuaLibrary.cs" />
+    <Compile Include="lua\uses_apihawk\UserDataLibrary.cs" />
+    <Compile Include="lua\uses_self\BitLuaLibrary.cs" />
+    <Compile Include="lua\uses_self\EventLuaLibrary.cs" />
+    <Compile Include="lua\uses_self\GenesisLuaLibrary.cs" />
+    <Compile Include="lua\uses_self\MainMemoryLuaLibrary.cs" />
+    <Compile Include="lua\uses_self\MemoryLuaLibrary.cs" />
+    <Compile Include="lua\uses_self\MemorySavestateLuaLibrary.cs" />
+    <Compile Include="lua\uses_self\NesLuaLibrary.cs" />
+    <Compile Include="lua\uses_self\SnesLuaLibrary.cs" />
+    <Compile Include="lua\uses_self\StringLuaLibrary.cs" />
     <Compile Include="miniz\LibMiniz.cs" />
     <Compile Include="miniz\MinizZipWriter.cs" />
     <Compile Include="movie\bk2\Bk2ControllerAdapter.cs" />
@@ -326,7 +356,7 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

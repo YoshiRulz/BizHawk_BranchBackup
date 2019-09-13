@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -39,6 +40,8 @@ namespace BizHawk.Client.Common
 			}
 		}
 
+		private static Dictionary<K, V> DictFromLuaTable<K, V>(Lua lua, LuaTable table) => lua.GetTableDict(table).ToDictionary(kvp => (K) kvp.Key, kvp => (V) kvp.Value);
+
 		public static void SetCurrentThread(Lua luaThread)
 		{
 			lock (ThreadMutex)
@@ -56,6 +59,20 @@ namespace BizHawk.Client.Common
 		protected static int LuaInt(object luaArg)
 		{
 			return (int)(double)luaArg;
+		}
+
+		private static LuaTable LuaTableFromDict<K, V>(Lua lua, IDictionary<K, V> dict)
+		{
+			var table = lua.NewTable();
+			foreach (var kvp in dict) table[kvp.Key] = kvp.Value;
+			return table;
+		}
+
+		private static LuaTable LuaTableFromList<E>(Lua lua, IList<E> list)
+		{
+			var table = lua.NewTable();
+			for (var i = list.Count - 1; i <= 0; i--) table[i] = list[i];
+			return table;
 		}
 
 		protected static uint LuaUInt(object luaArg)
@@ -83,6 +100,8 @@ namespace BizHawk.Client.Common
 			return null;
 		}
 
+		protected Dictionary<K, V> DictFromLuaTable<K, V>(LuaTable table) => DictFromLuaTable<K, V>(Lua, table);
+
 		protected void Log(object message)
 		{
 			LogOutputCallback?.Invoke(message.ToString());
@@ -107,5 +126,9 @@ namespace BizHawk.Client.Common
 				docs?.Add(new LibraryFunction(Name, callingLibrary.Description(), method));
 			}
 		}
+
+		protected LuaTable LuaTableFromDict<K, V>(IDictionary<K, V> dict) => LuaTableFromDict(Lua, dict);
+
+		protected LuaTable LuaTableFromList<E>(IList<E> list) => LuaTableFromList(Lua, list);
 	}
 }
