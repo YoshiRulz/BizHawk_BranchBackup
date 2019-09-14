@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using BizHawk.Client.Common;
+
 namespace BizHawk.Client.ApiHawk
 {
 	/// <summary>
@@ -51,7 +53,6 @@ namespace BizHawk.Client.ApiHawk
 
 		public object GetApi(Type t)
 		{
-			IExternalApi Api;
 			KeyValuePair<Type, IExternalApi>[] k = _Apis.Where(kvp => t.IsAssignableFrom(kvp.Key)).ToArray();
 			if (k.Length > 0)
 			{
