@@ -114,6 +114,7 @@
     <Compile Include="7z\SevenZipExtractorAsynchronous.cs" />
     <Compile Include="7z\SevenZipSfx.cs" />
     <Compile Include="7z\StreamWrappers.cs" />
+    <Compile Include="API\APISubsetContainer.cs" />
     <Compile Include="API\Classes\EmuAPI.cs" />
     <Compile Include="API\Classes\GameInfoAPI.cs" />
     <Compile Include="API\Classes\InputMovieAPI.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="IZipWriter.cs" />
     <Compile Include="KeyTurbo.cs" />
     <Compile Include="lua\BitLuaLibrary.cs" />
+    <Compile Include="lua\DelegatingLuaLibrary.cs" />
     <Compile Include="lua\EmulatorLuaLibrary.cs" />
     <Compile Include="lua\EnvironmentSandbox.cs" />
     <Compile Include="lua\EventLuaLibrary.cs" />

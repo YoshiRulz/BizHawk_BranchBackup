@@ -1,222 +1,120 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using BizHawk.Client.Common;
-
-namespace BizHawk.Client.ApiHawk
+namespace BizHawk.Client.Common
 {
 	public sealed class JoypadAPI : IJoypad
 	{
-		public JoypadAPI()
-		{ }
+		private readonly Action<string> LogCallback;
 
-		public Dictionary<string,dynamic> Get(int? controller = null)
+		public JoypadAPI(Action<string> logCallback)
 		{
-			var buttons = new Dictionary<string, dynamic>();
-			var adaptor = Global.AutofireStickyXORAdapter;
-			foreach (var button in adaptor.Source.Definition.BoolButtons)
-			{
-				if (!controller.HasValue)
-				{
-					buttons[button] = adaptor.IsPressed(button);
-				}
-				else if (button.Length >= 3 && button.Substring(0, 2) == $"P{controller}")
-				{
-					buttons[button.Substring(3)] = adaptor.IsPressed($"P{controller} {button.Substring(3)}");
-				}
-			}
-
-			foreach (var button in adaptor.Source.Definition.FloatControls)
-			{
-				if (controller == null)
-				{
-					buttons[button] = adaptor.GetFloat(button);
-				}
-				else if (button.Length >= 3 && button.Substring(0, 2) == $"P{controller}")
-				{
-					buttons[button.Substring(3)] = adaptor.GetFloat($"P{controller} {button.Substring(3)}");
-				}
-			}
-
-			buttons["clear"] = null;
-			buttons["getluafunctionslist"] = null;
-			buttons["output"] = null;
-
-			return buttons;
+			LogCallback = logCallback;
 		}
 
-		// TODO: what about float controls?
+		public JoypadAPI() : this(Console.WriteLine) {}
+
+		#region Public API (IJoypad)
+
+		public Dictionary<string, dynamic> Get(int? controller = null)
+		{
+			var dict = new Dictionary<string, dynamic> { ["clear"] = null, ["getluafunctionslist"] = null, ["output"] = null };
+			var adapter = Global.AutofireStickyXORAdapter;
+			foreach (var button in adapter.Source.Definition.BoolButtons)
+			{
+				if (controller == null)
+					dict[button] = adapter.IsPressed(button);
+				else if (button.Length >= 3 && button.Substring(0, 2) == $"P{controller}")
+					dict[button.Substring(3)] = adapter.IsPressed($"P{controller} {button.Substring(3)}");
+			}
+			foreach (var button in adapter.Source.Definition.FloatControls)
+			{
+				if (controller == null)
+					dict[button] = adapter.GetFloat(button);
+				else if (button.Length >= 3 && button.Substring(0, 2) == $"P{controller}")
+					dict[button.Substring(3)] = adapter.GetFloat($"P{controller} {button.Substring(3)}");
+			}
+			return dict;
+		}
+
+		//TODO: what about float controls for Lua?
 		public Dictionary<string, dynamic> GetImmediate()
 		{
-			var buttons = new Dictionary<string, dynamic>();
-			var adaptor = Global.ActiveController;
-			foreach (var button in adaptor.Definition.BoolButtons)
-			{
-				buttons[button] = adaptor.IsPressed(button);
-			}
-			foreach (var button in adaptor.Definition.FloatControls)
-			{
-				buttons[button] = adaptor.GetFloat(button);
-			}
+			var dict = new Dictionary<string, dynamic>();
+			var adapter = Global.ActiveController;
+			foreach (var button in adapter.Definition.BoolButtons) dict[button] = adapter.IsPressed(button);
+			foreach (var button in adapter.Definition.FloatControls) dict[button] = adapter.GetFloat(button);
+			return dict;
+		}
 
-			return buttons;
+		public void Set(string button, bool? state = null, int? controller = null)
+		{
+			try
+			{
+				var toPress = controller == null ? button : $"P{controller} {button}";
+				if (state.HasValue) Global.LuaAndAdaptor.SetButton(toPress, state.Value);
+				else Global.LuaAndAdaptor.UnSet(toPress);
+				Global.ActiveController.Overrides(Global.LuaAndAdaptor);
+			}
+			catch
+			{
+				// ignored
+			}
+		}
+
+		public void Set(Dictionary<string, bool> buttons, int? controller = null)
+		{
+			try
+			{
+				foreach (var kvp in buttons) Set(kvp.Key, kvp.Value, controller);
+			}
+			catch
+			{
+				// ignored
+			}
+		}
+
+		public void SetAnalog(string control, float? value = null, object controller = null)
+		{
+			try
+			{
+				Global.StickyXORAdapter.SetFloat(controller == null ? control : $"P{controller} {control}", value);
+			}
+			catch
+			{
+				// ignored
+			}
+		}
+
+		public void SetAnalog(Dictionary<string, float> controls, object controller = null)
+		{
+			try
+			{
+				foreach (var control in controls) SetAnalog(control.Key, control.Value, controller);
+			}
+			catch
+			{
+				// ignored
+			}
 		}
 
 		public void SetFromMnemonicStr(string inputLogEntry)
 		{
 			try
 			{
-				var lg = Global.MovieSession.MovieControllerInstance();
-				lg.SetControllersAsMnemonic(inputLogEntry);
-
-				foreach (var button in lg.Definition.BoolButtons)
-				{
-					Global.LuaAndAdaptor.SetButton(button, lg.IsPressed(button));
-				}
-
-				foreach (var floatButton in lg.Definition.FloatControls)
-				{
-					Global.LuaAndAdaptor.SetFloat(floatButton, lg.GetFloat(floatButton));
-				}
+				var controller = Global.MovieSession.MovieControllerInstance();
+				controller.SetControllersAsMnemonic(inputLogEntry);
+				foreach (var button in controller.Definition.BoolButtons)
+					Global.LuaAndAdaptor.SetButton(button, controller.IsPressed(button));
+				foreach (var floatButton in controller.Definition.FloatControls)
+					Global.LuaAndAdaptor.SetFloat(floatButton, controller.GetFloat(floatButton));
 			}
 			catch (Exception)
 			{
-				Console.WriteLine($"invalid mnemonic string: {inputLogEntry}");
+				LogCallback($"invalid mnemonic string: {inputLogEntry}");
 			}
 		}
 
-		public void Set(Dictionary<string,bool> buttons, int? controller = null)
-		{
-			try
-			{
-				foreach (var button in buttons.Keys)
-				{
-					var invert = false;
-					bool? theValue;
-					var theValueStr = buttons[button].ToString();
-
-					if (!string.IsNullOrWhiteSpace(theValueStr))
-					{
-						if (theValueStr.ToLower() == "false")
-						{
-							theValue = false;
-						}
-						else if (theValueStr.ToLower() == "true")
-						{
-							theValue = true;
-						}
-						else
-						{
-							invert = true;
-							theValue = null;
-						}
-					}
-					else
-					{
-						theValue = null;
-					}
-
-					var toPress = button.ToString();
-					if (controller.HasValue)
-					{
-						toPress = $"P{controller} {button}";
-					}
-
-					if (!invert)
-					{
-						if (theValue.HasValue) // Force
-						{
-							Global.LuaAndAdaptor.SetButton(toPress, theValue.Value);
-							Global.ActiveController.Overrides(Global.LuaAndAdaptor);
-						}
-						else // Unset
-						{
-							Global.LuaAndAdaptor.UnSet(toPress);
-							Global.ActiveController.Overrides(Global.LuaAndAdaptor);
-						}
-					}
-					else // Inverse
-					{
-						Global.LuaAndAdaptor.SetInverse(toPress);
-						Global.ActiveController.Overrides(Global.LuaAndAdaptor);
-					}
-				}
-			}
-			catch
-			{
-				/*Eat it*/
-			}
-		}
-		public void Set(string button, bool? state = null, int? controller = null)
-		{
-			try
-			{
-				var toPress = button;
-				if (controller.HasValue)
-				{
-					toPress = $"P{controller} {button}";
-				}
-				if (state.HasValue)
-					Global.LuaAndAdaptor.SetButton(toPress, state.Value);
-				else 
-					Global.LuaAndAdaptor.UnSet(toPress);
-				Global.ActiveController.Overrides(Global.LuaAndAdaptor);
-			}
-			catch
-			{
-				/*Eat it*/
-			}
-		}
-		public void SetAnalog(Dictionary<string,float> controls, object controller = null)
-		{
-			try
-			{
-				foreach (var name in controls.Keys)
-				{
-					var theValueStr = controls[name].ToString();
-					float? theValue = null;
-
-					if (!string.IsNullOrWhiteSpace(theValueStr))
-					{
-						float f;
-						if (float.TryParse(theValueStr, out f))
-						{
-							theValue = f;
-						}
-					}
-
-					if (controller == null)
-					{
-						Global.StickyXORAdapter.SetFloat(name.ToString(), theValue);
-					}
-					else
-					{
-						Global.StickyXORAdapter.SetFloat($"P{controller} {name}", theValue);
-					}
-				}
-			}
-			catch
-			{
-				/*Eat it*/
-			}
-		}
-		public void SetAnalog(string control, float? value = null, object controller = null)
-		{
-			try
-			{
-				if (controller == null)
-				{
-					Global.StickyXORAdapter.SetFloat(control, value);
-				}
-				else
-				{
-					Global.StickyXORAdapter.SetFloat($"P{controller} {control}", value);
-				}
-			}
-			catch
-			{
-				/*Eat it*/
-			}
-		}
+		#endregion
 	}
 }

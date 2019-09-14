@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-namespace BizHawk.Client.ApiHawk
+namespace BizHawk.Client.Common
 {
 	public interface IInputMovie : IExternalAPI
 	{
@@ -16,7 +16,7 @@ namespace BizHawk.Client.ApiHawk
 		string Mode();
 		void Save(string filename = "");
 		void SetReadOnly(bool readOnly);
-		void SetRerecordCount(double count);
+		void SetRerecordCount(ulong count);
 		void SetRerecordCounting(bool counting);
 		void Stop();
 		double GetFps();

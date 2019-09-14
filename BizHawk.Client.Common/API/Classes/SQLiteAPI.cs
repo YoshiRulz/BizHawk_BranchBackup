@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Data;
 using System.Data.SQLite;
+using System.Linq;
 
-namespace BizHawk.Client.ApiHawk
+namespace BizHawk.Client.Common
 {
 	public sealed class SQLiteAPI : ISQLite
 	{
-		public SQLiteAPI() : base()
-		{ }
+		private SQLiteConnection connection;
 
-		SQLiteConnection m_dbConnection;
-		string connectionString;
+		#region Public API (ISQLite)
 
 		public string CreateDatabase(string name)
 		{
@@ -24,23 +23,22 @@ namespace BizHawk.Client.ApiHawk
 			{
 				return sqlEX.Message;
 			}
-
 		}
 
 		public string OpenDatabase(string name)
 		{
 			try
 			{
-				SQLiteConnectionStringBuilder connBuilder = new SQLiteConnectionStringBuilder();
-				connBuilder.DataSource = name;
-				connBuilder.Version = 3; //SQLite version 
-				connBuilder.JournalMode = SQLiteJournalModeEnum.Wal;  //Allows for reads and writes to happen at the same time
-				connBuilder.DefaultIsolationLevel = System.Data.IsolationLevel.ReadCommitted;  //This only helps make the database lock left. May be pointless now
-				connBuilder.SyncMode = SynchronizationModes.Off; //This shortens the delay for do synchronous calls.
-				m_dbConnection = new SQLiteConnection(connBuilder.ToString());
-				connectionString = connBuilder.ToString();
-				m_dbConnection.Open();
-				m_dbConnection.Close();
+				connection = new SQLiteConnection(new SQLiteConnectionStringBuilder {
+						DataSource = name,
+						Version = 3, // SQLite version
+						JournalMode = SQLiteJournalModeEnum.Wal, // Allows for reads and writes to happen at the same time
+						DefaultIsolationLevel = IsolationLevel.ReadCommitted, // This only helps make the database lock left. May be pointless now
+						SyncMode = SynchronizationModes.Off // This shortens the delay for do synchronous calls.
+					}.ToString()
+				);
+				connection.Open();
+				connection.Close();
 				return "Database Opened Successfully";
 			}
 			catch (SQLiteException sqlEX)
@@ -49,71 +47,29 @@ namespace BizHawk.Client.ApiHawk
 			}
 		}
 
-		public string WriteCommand(string query = "")
+		public dynamic ReadCommand(string query)
 		{
-			if (query == "")
-			{
-				return "query is empty";
-			}
+			if (string.IsNullOrWhiteSpace(query)) return "query is empty";
 			try
 			{
-				m_dbConnection.Open();
-				string sql = query;
-				SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
-				command.ExecuteNonQuery();
-				m_dbConnection.Close();
-
-				return "Command ran successfully";
-
-			}
-			catch (NullReferenceException nullEX)
-			{
-				return "Database not open.";
-			}
-			catch (SQLiteException sqlEX)
-			{
-				m_dbConnection.Close();
-				return sqlEX.Message;
-			}
-		}
-
-		public dynamic ReadCommand(string query = "")
-		{
-			if (query == "")
-			{
-				return "query is empty";
-			}
-			try
-			{
-				var table = new Dictionary<string, object>();
-				m_dbConnection.Open();
-				string sql = $"PRAGMA read_uncommitted =1;{query}";
-				SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
-				SQLiteDataReader reader = command.ExecuteReader();
-				bool rows = reader.HasRows;
-				long rowCount = 0;
-				var columns = new List<string>();
-				for (int i = 0; i < reader.FieldCount; ++i) //Add all column names into list
+				connection.Open();
+				var reader = new SQLiteCommand($"PRAGMA read_uncommitted =1;{query}", connection).ExecuteReader();
+				if (reader.HasRows)
 				{
-					columns.Add(reader.GetName(i));
+					var columnNames = Enumerable.Range(0, reader.FieldCount).Select(reader.GetName).ToList();
+					var rowCount = 0L;
+					var table = new Dictionary<string, object>();
+					while (reader.Read())
+						foreach (var i in Enumerable.Range(0, reader.FieldCount))
+							table[$"{columnNames[i]} {rowCount++}"] = reader.GetValue(i);
+					reader.Close();
+					return table;
 				}
-				while (reader.Read())
+				else
 				{
-					for (int i = 0; i < reader.FieldCount; ++i)
-					{
-						table[$"{columns[i]} {rowCount}"] = reader.GetValue(i);
-					}
-					rowCount += 1;
-				}
-				reader.Close();
-				m_dbConnection.Close();
-				if (rows == false)
-				{
+					reader.Close();
 					return "No rows found";
 				}
-
-				return table;
-
 			}
 			catch (NullReferenceException)
 			{
@@ -121,9 +77,37 @@ namespace BizHawk.Client.ApiHawk
 			}
 			catch (SQLiteException sqlEX)
 			{
-				m_dbConnection.Close();
 				return sqlEX.Message;
 			}
+			finally
+			{
+				connection?.Close();
+			}
 		}
+
+		public string WriteCommand(string query)
+		{
+			if (string.IsNullOrWhiteSpace(query)) return "query is empty";
+			try
+			{
+				connection.Open();
+				new SQLiteCommand(query, connection).ExecuteNonQuery();
+				return "Command ran successfully";
+			}
+			catch (NullReferenceException)
+			{
+				return "Database not open.";
+			}
+			catch (SQLiteException sqlEx)
+			{
+				return sqlEx.Message;
+			}
+			finally
+			{
+				connection?.Close();
+			}
+		}
+
+		#endregion
 	}
 }

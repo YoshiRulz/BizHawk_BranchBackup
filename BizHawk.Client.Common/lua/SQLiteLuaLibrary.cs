@@ -1,148 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.SQLite;
+
 using NLua;
 
 namespace BizHawk.Client.Common
 {
 	[Description("A library for performing SQLite operations.")]
-	public sealed class SQLiteLuaLibrary : LuaLibraryBase
+	public sealed class SQLiteLuaLibrary : DelegatingLuaLibrary
 	{
-		public SQLiteLuaLibrary(Lua lua)
-			: base(lua) { }
-
-		public SQLiteLuaLibrary(Lua lua, Action<string> logOutputCallback)
-			: base(lua, logOutputCallback) { }
-
 		public override string Name => "SQL";
 
-		SQLiteConnection m_dbConnection;
-		string connectionString;
+		public SQLiteLuaLibrary(Lua lua) : base(lua) {}
 
-		[LuaMethodExample("local stSQLcre = SQL.createdatabase( \"eg_db\" );")]
-		[LuaMethod("createdatabase", "Creates a SQLite Database. Name should end with .db")]
-		public string CreateDatabase(string name)
-		{
-			try
-			{
-				SQLiteConnection.CreateFile(name);
-				return "Database Created Successfully";
-			}
-			catch (SQLiteException sqlEX)
-			{
-				return sqlEX.Message;
-			}
+		public SQLiteLuaLibrary(Lua lua, Action<string> logOutputCallback) : base(lua, logOutputCallback) {}
 
-		}
+		#region Delegated to ApiHawk
 
+		[LuaMethodExample("local stSQLcre = SQL.createdatabase( \"eg_db\" );")] //TODO docs
+		[LuaMethod("createdatabase", "Creates a SQLite Database. Name should end with .db")] //TODO docs
+		public string CreateDatabase(string name) => ApiHawkContainer.Sql.CreateDatabase(name);
 
-		[LuaMethodExample("local stSQLope = SQL.opendatabase( \"eg_db\" );")]
-		[LuaMethod("opendatabase", "Opens a SQLite database. Name should end with .db")]
-		public string OpenDatabase(string name)
-		{
-			try
-			{
-				SQLiteConnectionStringBuilder connBuilder = new SQLiteConnectionStringBuilder();
-				connBuilder.DataSource = name;
-				connBuilder.Version = 3; //SQLite version 
-				connBuilder.JournalMode = SQLiteJournalModeEnum.Wal;  //Allows for reads and writes to happen at the same time
-				connBuilder.DefaultIsolationLevel = System.Data.IsolationLevel.ReadCommitted;  //This only helps make the database lock left. May be pointless now
-				connBuilder.SyncMode = SynchronizationModes.Off; //This shortens the delay for do synchronous calls.
-				m_dbConnection = new SQLiteConnection(connBuilder.ToString());
-				connectionString = connBuilder.ToString();
-				m_dbConnection.Open();
-				m_dbConnection.Close();
-				return "Database Opened Successfully";
-			}
-			catch (SQLiteException sqlEX)
-			{
-				return sqlEX.Message;
-			}
-		}
+		[LuaMethodExample("local stSQLope = SQL.opendatabase( \"eg_db\" );")] //TODO docs
+		[LuaMethod("opendatabase", "Opens a SQLite database. Name should end with .db")] //TODO docs
+		public string OpenDatabase(string name) => ApiHawkContainer.Sql.OpenDatabase(name);
 
-		[LuaMethodExample("local stSQLwri = SQL.writecommand( \"CREATE TABLE eg_tab ( eg_tab_id integer PRIMARY KEY, eg_tab_row_name text NOT NULL ); INSERT INTO eg_tab ( eg_tab_id, eg_tab_row_name ) VALUES ( 1, 'Example table row' );\" );")]
-		[LuaMethod("writecommand", "Runs a SQLite write command which includes CREATE,INSERT, UPDATE. " +
-			"Ex: create TABLE rewards (ID integer  PRIMARY KEY, action VARCHAR(20)) ")]
-		public string WriteCommand(string query = "")
-		{
-			if (query == "")
-			{
-				return "query is empty";
-			}
-			try
-			{
-				m_dbConnection.Open();
-				string sql = query;
-				SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
-				command.ExecuteNonQuery();
-				m_dbConnection.Close();
+		[LuaMethodExample("local stSQLwri = SQL.writecommand( \"CREATE TABLE eg_tab ( eg_tab_id integer PRIMARY KEY, eg_tab_row_name text NOT NULL ); INSERT INTO eg_tab ( eg_tab_id, eg_tab_row_name ) VALUES ( 1, 'Example table row' );\" );")] //TODO docs
+		[LuaMethod("writecommand", "Runs a SQLite write command which includes CREATE,INSERT, UPDATE. Ex: create TABLE rewards (ID integer  PRIMARY KEY, action VARCHAR(20)) ")] //TODO docs
+		public string WriteCommand(string query = "") => ApiHawkContainer.Sql.WriteCommand(query);
 
-				return "Command ran successfully";
-
-			}
-			catch (NullReferenceException)
-			{
-				return "Database not open.";
-			}
-			catch (SQLiteException sqlEx)
-			{
-				m_dbConnection.Close();
-				return sqlEx.Message;
-			}
-		}
-
-		[LuaMethodExample("local obSQLrea = SQL.readcommand( \"SELECT * FROM eg_tab WHERE eg_tab_id = 1;\" );")]
-		[LuaMethod("readcommand", "Run a SQLite read command which includes Select. Returns all rows into a LuaTable." +
-			"Ex: select * from rewards")]
+		[LuaMethodExample("local obSQLrea = SQL.readcommand( \"SELECT * FROM eg_tab WHERE eg_tab_id = 1;\" );")] //TODO docs
+		[LuaMethod("readcommand", "Run a SQLite read command which includes Select. Returns all rows into a LuaTable. Ex: select * from rewards")] //TODO docs
 		public dynamic ReadCommand(string query = "")
 		{
-			if (query == "")
-			{
-				return "query is empty";
-			}
-			try
-			{
-				var table = Lua.NewTable();
-				m_dbConnection.Open();
-				string sql = $"PRAGMA read_uncommitted =1;{query}";
-				SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
-				SQLiteDataReader reader = command.ExecuteReader();
-				bool rows = reader.HasRows;
-				long rowCount = 0;
-				var columns = new List<string>();
-				for (int i = 0; i < reader.FieldCount; ++i) //Add all column names into list
-				{
-					columns.Add(reader.GetName(i));
-				}
-				while (reader.Read())
-				{
-					for (int i = 0; i < reader.FieldCount; ++i)
-					{
-						table[$"{columns[i]} {rowCount}"] = reader.GetValue(i);
-					}
-					rowCount += 1;
-				}
-				reader.Close();
-				m_dbConnection.Close();
-				if (rows == false)
-				{
-					return "No rows found";
-				}
-
-				return table;
-
-			}
-			catch (NullReferenceException)
-			{
-				return "Database not opened.";
-			}
-			catch (SQLiteException sqlEX)
-			{
-				m_dbConnection.Close();
-				return sqlEX.Message;
-			}
+			var result = ApiHawkContainer.Sql.ReadCommand(query);
+			return result is Dictionary<string, object> ? LuaTableFromDict(result) : result;
 		}
 
+		#endregion
 	}
 }

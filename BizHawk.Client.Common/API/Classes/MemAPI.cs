@@ -5,38 +5,40 @@ using BizHawk.Emulation.Common;
 using BizHawk.Emulation.Common.IEmulatorExtensions;
 using BizHawk.Common.BufferExtensions;
 
-namespace BizHawk.Client.ApiHawk
+namespace BizHawk.Client.Common
 {
 	public sealed class MemAPI : MemAPIBase, IMem
 	{
-		private MemoryDomain _currentMemoryDomain;
-		private bool _isBigEndian = false;
-		public MemAPI()
-			: base()
-		{
-		}
+		private readonly Action<string> LogCallback;
 
 		protected override MemoryDomain Domain
 		{
 			get
 			{
-				if (MemoryDomainCore != null)
+				if (_currentMemoryDomain != null) return _currentMemoryDomain;
+				if (MemoryDomainCore == null)
 				{
-					if (_currentMemoryDomain == null)
-					{
-						_currentMemoryDomain = MemoryDomainCore.HasSystemBus
-							? MemoryDomainCore.SystemBus
-							: MemoryDomainCore.MainMemory;
-					}
-
-					return _currentMemoryDomain;
+					var error = $"Error: {Emulator.Attributes().CoreName} does not implement memory domains";
+					LogCallback(error);
+					throw new NotImplementedException(error);
 				}
-
-				var error = $"Error: {Emulator.Attributes().CoreName} does not implement memory domains";
-				Console.WriteLine(error);
-				throw new NotImplementedException(error);
+				return _currentMemoryDomain = MemoryDomainCore.HasSystemBus ? MemoryDomainCore.SystemBus : MemoryDomainCore.MainMemory;
 			}
 		}
+
+		private MemoryDomain _currentMemoryDomain;
+		private bool _isBigEndian;
+
+		public MemAPI(Action<string> logCallback)
+		{
+			LogCallback = logCallback;
+		}
+
+		public MemAPI() : this(Console.WriteLine) {}
+
+		#region Public API (IMem)
+
+		#endregion
 
 		#region Unique Library Methods
 

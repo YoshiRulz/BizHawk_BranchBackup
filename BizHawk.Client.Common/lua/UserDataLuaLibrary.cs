@@ -1,70 +1,43 @@
 ﻿using System;
 using System.ComponentModel;
 
-using NLua;
-
 using BizHawk.Client.Common;
+
+using NLua;
 
 namespace BizHawk.Client.EmuHawk
 {
 	[Description("A library for setting and retrieving dynamic data that will be saved and loaded with savestates")]
-	public sealed class UserDataLuaLibrary : LuaLibraryBase
+	public sealed class UserDataLuaLibrary : DelegatingLuaLibrary
 	{
-		public UserDataLuaLibrary(Lua lua)
-			: base(lua) { }
-
-		public UserDataLuaLibrary(Lua lua, Action<string> logOutputCallback)
-			: base(lua, logOutputCallback) { }
-
 		public override string Name => "userdata";
 
-		[LuaMethodExample("userdata.set(\"Unique key\", \"Current key data\");")]
-		[LuaMethod("set", "adds or updates the data with the given key with the given value")]
-		public void Set(string name, object value)
-		{
-			if (value != null)
-			{
-				var t = value.GetType();
-				if (!t.IsPrimitive && t != typeof(string))
-				{
-					throw new InvalidOperationException("Invalid type for userdata");
-				}
-			}
+		public UserDataLuaLibrary(Lua lua) : base(lua) {}
 
-			Global.UserBag[name] = value;
-		}
+		public UserDataLuaLibrary(Lua lua, Action<string> logOutputCallback) : base(lua, logOutputCallback) {}
 
-		[LuaMethodExample("local obuseget = userdata.get( \"Unique key\" );")]
-		[LuaMethod("get", "gets the data with the given key, if the key does not exist it will return nil")]
-		public object Get(string key)
-		{
-			if (Global.UserBag.ContainsKey(key))
-			{
-				return Global.UserBag[key];
-			}
+		#region Delegated to ApiHawk
 
-			return null;
-		}
+		[LuaMethodExample("userdata.clear()")]
+		[LuaMethod("clear", "clears all user data")] //TODO docs
+		public void Clear() => ApiHawkContainer.UserData.Clear();
 
-		[LuaMethodExample("userdata.clear( );")]
-		[LuaMethod("clear", "clears all user data")]
-		public void Clear()
-		{
-			Global.UserBag.Clear();
-		}
+		[LuaMethodExample("if ( userdata.containskey( \"Unique key\" ) ) then\r\n\tconsole.log( \"returns whether or not there is an entry for the given key\" );\r\nend;")] //TODO docs
+		[LuaMethod("containskey", "returns whether or not there is an entry for the given key")] //TODO docs
+		public bool ContainsKey(string key) => ApiHawkContainer.UserData.ContainsKey(key);
 
-		[LuaMethodExample("if ( userdata.remove( \"Unique key\" ) ) then\r\n\tconsole.log( \"remove the data with the given key.Returns true if the element is successfully found and removed; otherwise, false.\" );\r\nend;")]
-		[LuaMethod("remove", "remove the data with the given key. Returns true if the element is successfully found and removed; otherwise, false.")]
-		public bool Remove(string key)
-		{
-			return Global.UserBag.Remove(key);
-		}
+		[LuaMethodExample("local obuseget = userdata.get( \"Unique key\" );")] //TODO docs
+		[LuaMethod("get", "gets the data with the given key, if the key does not exist it will return nil")] //TODO docs
+		public object Get(string key) => ApiHawkContainer.UserData.Get(key);
 
-		[LuaMethodExample("if ( userdata.containskey( \"Unique key\" ) ) then\r\n\tconsole.log( \"returns whether or not there is an entry for the given key\" );\r\nend;")]
-		[LuaMethod("containskey", "returns whether or not there is an entry for the given key")]
-		public bool ContainsKey(string key)
-		{
-			return Global.UserBag.ContainsKey(key);
-		}
+		[LuaMethodExample("if ( userdata.remove( \"Unique key\" ) ) then\r\n\tconsole.log( \"remove the data with the given key.Returns true if the element is successfully found and removed; otherwise, false.\" );\r\nend;")] //TODO docs
+		[LuaMethod("remove", "remove the data with the given key. Returns true if the element is successfully found and removed; otherwise, false.")] //TODO docs
+		public bool Remove(string key) => ApiHawkContainer.UserData.Remove(key);
+
+		[LuaMethodExample("userdata.set(\"Unique key\", \"Current key data\");")] //TODO docs
+		[LuaMethod("set", "adds or updates the data with the given key with the given value")] //TODO docs
+		public void Set(string name, object value) => ApiHawkContainer.UserData.Set(name, value);
+
+		#endregion
 	}
 }

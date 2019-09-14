@@ -11,17 +11,7 @@ namespace BizHawk.Client.Common
 	[Description("These functions behavior identically to the mainmemory functions but the user can set the memory domain to read and write from. The default domain is main memory. Use getcurrentmemorydomain(), and usememorydomain() to control which domain is used. Each core has its own set of valid memory domains. Use getmemorydomainlist() to get a list of memory domains for the current core loaded.")]
 	public sealed class MemoryLuaLibrary : LuaMemoryBase
 	{
-		private MemoryDomain _currentMemoryDomain;
-
-		public MemoryLuaLibrary(Lua lua)
-			: base(lua)
-		{
-		}
-
-		public MemoryLuaLibrary(Lua lua, Action<string> logOutputCallback)
-			: base(lua, logOutputCallback)
-		{
-		}
+		private readonly Action<string> LogCallback;
 
 		public override string Name => "memory";
 
@@ -29,22 +19,27 @@ namespace BizHawk.Client.Common
 		{
 			get
 			{
-				if (MemoryDomainCore != null)
+				if (_currentMemoryDomain != null) return _currentMemoryDomain;
+				if (MemoryDomainCore == null)
 				{
-					if (_currentMemoryDomain == null)
-					{
-						_currentMemoryDomain = MemoryDomainCore.HasSystemBus
-							? MemoryDomainCore.SystemBus
-							: MemoryDomainCore.MainMemory;
-					}
-
-					return _currentMemoryDomain;
+					var error = $"Error: {Emulator.Attributes().CoreName} does not implement memory domains";
+					LogCallback(error);
+					throw new NotImplementedException(error);
 				}
-
-				var error = $"Error: {Emulator.Attributes().CoreName} does not implement memory domains";
-				Log(error);
-				throw new NotImplementedException(error);
+				return _currentMemoryDomain = MemoryDomainCore.HasSystemBus ? MemoryDomainCore.SystemBus : MemoryDomainCore.MainMemory;
 			}
+		}
+
+		private MemoryDomain _currentMemoryDomain;
+
+		public MemoryLuaLibrary(Lua lua) : base(lua)
+		{
+			LogCallback = Log;
+		}
+
+		public MemoryLuaLibrary(Lua lua, Action<string> logOutputCallback) : base(lua, logOutputCallback)
+		{
+			LogCallback = Log;
 		}
 
 		#region Unique Library Methods
@@ -103,12 +98,12 @@ namespace BizHawk.Client.Common
 					return true;
 				}
 
-				Log($"Unable to find domain: {domain}");
+				LogCallback($"Unable to find domain: {domain}");
 				return false;
 			}
 			catch // Just in case
 			{
-				Log($"Unable to find domain: {domain}");
+				LogCallback($"Unable to find domain: {domain}");
 			}
 
 			return false;
@@ -124,13 +119,13 @@ namespace BizHawk.Client.Common
 			if (addr < 0 || addr >= d.Size)
 			{
 				string error = $"Address {addr} is outside the bounds of domain {d.Name}";
-				Log(error);
+				LogCallback(error);
 				throw new ArgumentOutOfRangeException(error);
 			}
 			if (addr + count > d.Size)
 			{
 				string error = $"Address {addr} + count {count} is outside the bounds of domain {d.Name}";
-				Log(error);
+				LogCallback(error);
 				throw new ArgumentOutOfRangeException(error);
 			}
 

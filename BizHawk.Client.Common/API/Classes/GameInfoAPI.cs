@@ -1,86 +1,31 @@
 ﻿using System.Collections.Generic;
 
-using BizHawk.Client.Common;
+using BizHawk.Common.CollectionExtensions;
 using BizHawk.Emulation.Common;
 
-namespace BizHawk.Client.ApiHawk
+namespace BizHawk.Client.Common
 {
 	public sealed class GameInfoAPI : IGameInfo
 	{
 		[OptionalService]
 		private IBoardInfo BoardInfo { get; set; }
 
-		public GameInfoAPI()
-		{ }
+		#region Public API (IGameInfo)
 
-		public string GetRomName()
-		{
-			if (Global.Game != null)
-			{
-				return Global.Game.Name ?? "";
-			}
+		public string GetBoardType() => BoardInfo?.BoardName ?? string.Empty;
 
-			return "";
-		}
+		public Dictionary<string, string> GetOptions() => Global.Game?.GetOptionsDict()?.ShallowCopy() ?? new Dictionary<string, string>();
 
-		public string GetRomHash()
-		{
-			if (Global.Game != null)
-			{
-				return Global.Game.Hash ?? "";
-			}
+		public string GetRomHash() => Global.Game?.Hash ?? string.Empty;
 
-			return "";
-		}
+		public string GetRomName() => Global.Game?.Name ?? string.Empty;
 
-		public bool InDatabase()
-		{
-			if (Global.Game != null)
-			{
-				return !Global.Game.NotInDatabase;
-			}
+		public string GetStatus() => (Global.Game?.Status)?.ToString() ?? string.Empty;
 
-			return false;
-		}
+		public bool InDatabase() => Global.Game != null && !Global.Game.NotInDatabase;
 
-		public string GetStatus()
-		{
-			if (Global.Game != null)
-			{
-				return Global.Game.Status.ToString();
-			}
+		public bool IsStatusBad() => Global.Game == null || Global.Game.IsRomStatusBad();
 
-			return "";
-		}
-
-		public bool IsStatusBad()
-		{
-			if (Global.Game != null)
-			{
-				return Global.Game.IsRomStatusBad();
-			}
-
-			return true;
-		}
-
-		public string GetBoardType()
-		{
-			return BoardInfo?.BoardName ?? "";
-		}
-
-		public Dictionary<string, string> GetOptions()
-		{
-			var options = new Dictionary<string, string>();
-
-			if (Global.Game != null)
-			{
-				foreach (var option in Global.Game.GetOptionsDict())
-				{
-					options[option.Key] = option.Value;
-				}
-			}
-
-			return options;
-		}
+		#endregion
 	}
 }

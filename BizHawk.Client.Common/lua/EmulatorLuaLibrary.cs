@@ -2,22 +2,18 @@
 using System.ComponentModel;
 
 using BizHawk.Emulation.Common;
-using BizHawk.Emulation.Common.IEmulatorExtensions;
-using BizHawk.Emulation.Cores.Nintendo.NES;
-using BizHawk.Emulation.Cores.PCEngine;
-using BizHawk.Emulation.Cores.Sega.MasterSystem;
-using BizHawk.Emulation.Cores.WonderSwan;
-using BizHawk.Emulation.Cores.Consoles.Nintendo.QuickNES;
 
 using NLua;
 
 namespace BizHawk.Client.Common
 {
 	[Description("A library for interacting with the currently loaded emulator core")]
-	public sealed class EmulatorLuaLibrary : LuaLibraryBase
+	public sealed class EmulatorLuaLibrary : DelegatingLuaLibrary
 	{
-		[RequiredService]
-		private IEmulator Emulator { get; set; }
+		public override string Name => "emu";
+
+		[OptionalService]
+		private IBoardInfo BoardInfo { get; set; }
 
 		[OptionalService]
 		private IDebuggable DebuggableCore { get; set; }
@@ -25,354 +21,116 @@ namespace BizHawk.Client.Common
 		[OptionalService]
 		private IDisassemblable DisassemblableCore { get; set; }
 
-		[OptionalService]
-		private IMemoryDomains MemoryDomains { get; set; }
+		[RequiredService]
+		private IEmulator Emulator { get; set; }
 
 		[OptionalService]
 		private IInputPollable InputPollableCore { get; set; }
 
 		[OptionalService]
-		private IRegionable RegionableCore { get; set; }
+		private IMemoryDomains MemoryDomains { get; set; }
 
 		[OptionalService]
-		private IBoardInfo BoardInfo { get; set; }
+		private IRegionable RegionableCore { get; set; }
+
+		public EmulatorLuaLibrary(Lua lua) : base(lua) {}
+
+		public EmulatorLuaLibrary(Lua lua, Action<string> logOutputCallback) : base(lua, logOutputCallback) {}
+
+		#region Delegated to ApiHawk
+
+		[LuaMethodExample("local disasm_tuple = emu.disassemble(0x8000)")]
+		[LuaMethod("disassemble", "Returns the disassembly object (disasm string and length int) for the given PC address. Uses System Bus domain if no domain name provided")] //TODO docs
+		public object Disassemble(uint pc, string name = "") => ApiHawkContainer.Emu.Disassemble(pc, name);
+
+		[LuaMethodExample("emu.displayvsync(true)")]
+		[LuaMethod("displayvsync", "Sets the display vsync property of the emulator")] //TODO docs
+		public void DisplayVsync(bool enabled) => ApiHawkContainer.Emu.DisplayVsync(enabled);
+
+		[LuaMethodExample("local frame_count = emu.framecount()")]
+		[LuaMethod("framecount", "Returns the current frame count")] //TODO docs
+		public int FrameCount() => ApiHawkContainer.Emu.FrameCount();
+
+		[LuaMethodExample("local stemuget = emu.getboardname()")] //TODO docs
+		[LuaMethod("getboardname", "returns (if available) the board name of the loaded ROM")] //TODO docs
+		public string GetBoardName() => ApiHawkContainer.Emu.GetBoardName();
+
+		[LuaMethodExample("local stemuget = emu.getdisplaytype()")] //TODO docs
+		[LuaMethod("getdisplaytype", "returns the display type (PAL vs NTSC) that the emulator is currently running in")] //TODO docs
+		public string GetDisplayType() => ApiHawkContainer.Emu.GetDisplayType();
+
+		//TODO: what about 64 bit registers?
+		[LuaMethodExample("local first_reg_value = emu.getregister(emu.getregisters()[0])")]
+		[LuaMethod("getregister", "returns the value of a cpu register or flag specified by name. For a complete list of possible registers or flags for a given core, use getregisters")] //TODO docs
+		public int GetRegister(string name) => (int?) ApiHawkContainer.Emu.GetRegister(name) ?? default(int);
+
+		[LuaMethodExample("local first_reg = emu.getregisters()[0]")]
+		[LuaMethod("getregisters", "returns the complete set of available flags and registers for a given core")] //TODO docs
+		public LuaTable GetRegisters() => LuaTableFromDict(ApiHawkContainer.Emu.GetRegisters());
+
+		[LuaMethodExample("local stemuget = emu.getsystemid()")] //TODO docs
+		[LuaMethod("getsystemid", "Returns the ID string of the current core loaded. Note: No ROM loaded will return the string NULL")] //TODO docs
+		public string GetSystemId() => ApiHawkContainer.Emu.GetSystemId();
+
+		[LuaMethodExample("if (emu.islagged()) then console.log(\"Returns whether or not the current frame is a lag frame\") end")] //TODO docs
+		[LuaMethod("islagged", "Returns whether or not the current frame is a lag frame")] //TODO docs
+		public bool IsLagged() => ApiHawkContainer.Emu.IsLagged();
+
+		[LuaMethodExample("local lag_count = emu.lagcount()")]
+		[LuaMethod("lagcount", "Returns the current lag count")] //TODO docs
+		public int LagCount() => ApiHawkContainer.Emu.LagCount();
+
+		[LuaMethodExample("emu.limitframerate(true)")]
+		[LuaMethod("limitframerate", "sets the limit framerate property of the emulator")] //TODO docs
+		public void LimitFramerate(bool enabled) => ApiHawkContainer.Emu.LimitFramerate(enabled);
+
+		[LuaMethodExample("emu.minimizeframeskip(true)")]
+		[LuaMethod("minimizeframeskip", "Sets the autominimizeframeskip value of the emulator")] //TODO docs
+		public void MinimizeFrameskip(bool enabled) => ApiHawkContainer.Emu.MinimizeFrameskip(enabled);
+
+		[LuaMethodExample("emu.setislagged(true)")]
+		[LuaMethod("setislagged", "Sets the lag flag for the current frame. If no value is provided, it will default to true")] //TODO docs
+		public void SetIsLagged(bool value = true) => ApiHawkContainer.Emu.SetIsLagged(value);
+
+		[LuaMethodExample("emu.setlagcount(50)")]
+		[LuaMethod("setlagcount", "Sets the current lag count")] //TODO docs
+		public void SetLagCount(int count) => ApiHawkContainer.Emu.SetLagCount(count);
+
+		[LuaMethodExample("emu.setregister(emu.getregisters()[0], -1000)")]
+		[LuaMethod("setregister", "sets the given register name to the given value")] //TODO docs
+		public void SetRegister(string register, int value) => ApiHawkContainer.Emu.SetRegister(register, value);
+
+		[LuaMethodExample("emu.setrenderplanes(true, false)")]
+		[LuaMethod("setrenderplanes", "Toggles the drawing of sprites and background planes. Set to false or nil to disable a pane, anything else will draw them")] //TODO docs
+		public void SetRenderPlanes(params bool[] luaParam) => ApiHawkContainer.Emu.SetRenderPlanes(luaParam);
+
+		[LuaMethodExample("local cycle_count = emu.totalexecutedcycles()")]
+		[LuaMethod("totalexecutedcycles", "gets the total number of executed cpu cycles")] //TODO docs
+		public long TotalExecutedycles() => ApiHawkContainer.Emu.TotalExecutedycles();
+
+		#endregion
+
+		#region Lua-specific
+
+		[LuaMethod("getluacore", "returns the name of the Lua core currently in use")] //TODO docs
+		public string GetLuaBackend() => Lua.WhichLua;
+
+		#endregion
+
+		#region Unable to delegate
 
 		public Action FrameAdvanceCallback { get; set; }
+
 		public Action YieldCallback { get; set; }
 
-		public EmulatorLuaLibrary(Lua lua)
-			: base(lua) { }
+		[LuaMethodExample("emu.frameadvance()")]
+		[LuaMethod("frameadvance", "Signals to the emulator to resume emulation. Necessary for any lua script while loop or else the emulator will freeze!")] //TODO docs
+		public void FrameAdvance() => FrameAdvanceCallback();
 
-		public EmulatorLuaLibrary(Lua lua, Action<string> logOutputCallback)
-			: base(lua, logOutputCallback) { }
+		[LuaMethodExample("emu.yield()")]
+		[LuaMethod("yield", "allows a script to run while emulation is paused and interact with the gui/main window in realtime ")] //TODO docs
+		public void Yield() => YieldCallback();
 
-		public override string Name => "emu";
-
-		[LuaMethodExample("emu.displayvsync( true );")]
-		[LuaMethod("displayvsync", "Sets the display vsync property of the emulator")]
-		public static void DisplayVsync(bool enabled)
-		{
-			Global.Config.VSync = enabled;
-		}
-
-		[LuaMethodExample("emu.frameadvance( );")]
-		[LuaMethod("frameadvance", "Signals to the emulator to resume emulation. Necessary for any lua script while loop or else the emulator will freeze!")]
-		public void FrameAdvance()
-		{
-			FrameAdvanceCallback();
-		}
-
-		[LuaMethodExample("local inemufra = emu.framecount( );")]
-		[LuaMethod("framecount", "Returns the current frame count")]
-		public int FrameCount()
-		{
-			return Emulator.Frame;
-		}
-
-		[LuaMethodExample("local obemudis = emu.disassemble( 0x8000 );")]
-		[LuaMethod("disassemble", "Returns the disassembly object (disasm string and length int) for the given PC address. Uses System Bus domain if no domain name provided")]
-		public object Disassemble(uint pc, string name = "")
-		{
-			try
-			{
-				if (DisassemblableCore == null)
-				{
-					throw new NotImplementedException();
-				}
-
-				int l;
-				MemoryDomain domain = MemoryDomains.SystemBus;
-
-				if (!string.IsNullOrEmpty(name))
-				{
-					domain = MemoryDomains[name];
-				}
-
-				var d = DisassemblableCore.Disassemble(domain, pc, out l);
-				return new { disasm = d, length = l };
-			}
-			catch (NotImplementedException)
-			{
-				Log($"Error: {Emulator.Attributes().CoreName} does not yet implement {nameof(IDisassemblable.Disassemble)}()");
-				return null;
-			}
-		}
-
-		// TODO: what about 64 bit registers?
-		[LuaMethodExample("local inemuget = emu.getregister( emu.getregisters( )[ 0 ] );")]
-		[LuaMethod("getregister", "returns the value of a cpu register or flag specified by name. For a complete list of possible registers or flags for a given core, use getregisters")]
-		public int GetRegister(string name)
-		{
-			try
-			{
-				if (DebuggableCore == null)
-				{
-					throw new NotImplementedException();
-				}
-
-				var registers = DebuggableCore.GetCpuFlagsAndRegisters();
-				return registers.ContainsKey(name)
-					? (int)registers[name].Value
-					: 0;
-			}
-			catch (NotImplementedException)
-			{
-				Log($"Error: {Emulator.Attributes().CoreName} does not yet implement {nameof(IDebuggable.GetCpuFlagsAndRegisters)}()");
-				return 0;
-			}
-		}
-
-		[LuaMethodExample("local nlemuget = emu.getregisters( );")]
-		[LuaMethod("getregisters", "returns the complete set of available flags and registers for a given core")]
-		public LuaTable GetRegisters()
-		{
-			var table = Lua.NewTable();
-
-			try
-			{
-				if (DebuggableCore == null)
-				{
-					throw new NotImplementedException();
-				}
-
-				foreach (var kvp in DebuggableCore.GetCpuFlagsAndRegisters())
-				{
-					table[kvp.Key] = kvp.Value.Value;
-				}
-			}
-			catch (NotImplementedException)
-			{
-				Log($"Error: {Emulator.Attributes().CoreName} does not yet implement {nameof(IDebuggable.GetCpuFlagsAndRegisters)}()");
-			}
-
-			return table;
-		}
-
-		[LuaMethodExample("emu.setregister( emu.getregisters( )[ 0 ], -1000 );")]
-		[LuaMethod("setregister", "sets the given register name to the given value")]
-		public void SetRegister(string register, int value)
-		{
-			try
-			{
-				if (DebuggableCore == null)
-				{
-					throw new NotImplementedException();
-				}
-
-				DebuggableCore.SetCpuRegister(register, value);
-			}
-			catch (NotImplementedException)
-			{
-				Log($"Error: {Emulator.Attributes().CoreName} does not yet implement {nameof(IDebuggable.SetCpuRegister)}()");
-			}
-		}
-
-		[LuaMethodExample("local inemutot = emu.totalexecutedcycles( );")]
-		[LuaMethod("totalexecutedcycles", "gets the total number of executed cpu cycles")]
-		public long TotalExecutedycles()
-		{
-			try
-			{
-				if (DebuggableCore == null)
-				{
-					throw new NotImplementedException();
-				}
-
-				return DebuggableCore.TotalExecutedCycles;
-			}
-			catch (NotImplementedException)
-			{
-				Log($"Error: {Emulator.Attributes().CoreName} does not yet implement {nameof(IDebuggable.TotalExecutedCycles)}()");
-
-				return 0;
-			}
-		}
-
-		[LuaMethodExample("local stemuget = emu.getsystemid( );")]
-		[LuaMethod("getsystemid", "Returns the ID string of the current core loaded. Note: No ROM loaded will return the string NULL")]
-		public static string GetSystemId()
-		{
-			return Global.Game.System;
-		}
-
-		[LuaMethodExample("if ( emu.islagged( ) ) then\r\n\tconsole.log( \"Returns whether or not the current frame is a lag frame\" );\r\nend;")]
-		[LuaMethod("islagged", "Returns whether or not the current frame is a lag frame")]
-		public bool IsLagged()
-		{
-			if (InputPollableCore != null)
-			{
-				return InputPollableCore.IsLagFrame;
-			}
-
-			Log($"Can not get lag information, {Emulator.Attributes().CoreName} does not implement {nameof(IInputPollable)}");
-			return false;
-		}
-
-		[LuaMethodExample("emu.setislagged( true );")]
-		[LuaMethod("setislagged", "Sets the lag flag for the current frame. If no value is provided, it will default to true")]
-		public void SetIsLagged(bool value = true)
-		{
-			if (InputPollableCore != null)
-			{
-				InputPollableCore.IsLagFrame = value;
-			}
-			else
-			{
-				Log($"Can not set lag information, {Emulator.Attributes().CoreName} does not implement {nameof(IInputPollable)}");
-			}
-		}
-
-		[LuaMethodExample("local inemulag = emu.lagcount( );")]
-		[LuaMethod("lagcount", "Returns the current lag count")]
-		public int LagCount()
-		{
-			if (InputPollableCore != null)
-			{
-				return InputPollableCore.LagCount;
-			}
-
-			Log($"Can not get lag information, {Emulator.Attributes().CoreName} does not implement {nameof(IInputPollable)}");
-			return 0;
-		}
-
-		[LuaMethodExample("emu.setlagcount( 50 );")]
-		[LuaMethod("setlagcount", "Sets the current lag count")]
-		public void SetLagCount(int count)
-		{
-			if (InputPollableCore != null)
-			{
-				InputPollableCore.LagCount = count;
-			}
-			else
-			{
-				Log($"Can not set lag information, {Emulator.Attributes().CoreName} does not implement {nameof(IInputPollable)}");
-			}
-		}
-
-		[LuaMethodExample("emu.limitframerate( true );")]
-		[LuaMethod("limitframerate", "sets the limit framerate property of the emulator")]
-		public static void LimitFramerate(bool enabled)
-		{
-			Global.Config.ClockThrottle = enabled;
-		}
-
-		[LuaMethodExample("emu.minimizeframeskip( true );")]
-		[LuaMethod("minimizeframeskip", "Sets the autominimizeframeskip value of the emulator")]
-		public static void MinimizeFrameskip(bool enabled)
-		{
-			Global.Config.AutoMinimizeSkipping = enabled;
-		}
-
-		[LuaMethodExample("emu.setrenderplanes( true, false );")]
-		[LuaMethod("setrenderplanes", "Toggles the drawing of sprites and background planes. Set to false or nil to disable a pane, anything else will draw them")]
-		public void SetRenderPlanes(params bool[] luaParam)
-		{
-			if (Emulator is NES)
-			{
-				// in the future, we could do something more arbitrary here.
-				// but this isn't any worse than the old system
-				var nes = Emulator as NES;
-				var s = nes.GetSettings();
-				s.DispSprites = luaParam[0];
-				s.DispBackground = luaParam[1];
-				nes.PutSettings(s);
-			}
-			else if (Emulator is QuickNES)
-			{
-				var quicknes = Emulator as QuickNES;
-				var s = quicknes.GetSettings();
-
-				// this core doesn't support disabling BG
-				bool showsp = GetSetting(0, luaParam);
-				if (showsp && s.NumSprites == 0)
-				{
-					s.NumSprites = 8;
-				}
-				else if (!showsp && s.NumSprites > 0)
-				{
-					s.NumSprites = 0;
-				}
-
-				quicknes.PutSettings(s);
-			}
-			else if (Emulator is PCEngine)
-			{
-				var pce = Emulator as PCEngine;
-				var s = pce.GetSettings();
-				s.ShowOBJ1 = GetSetting(0, luaParam);
-				s.ShowBG1 = GetSetting(1, luaParam);
-				if (luaParam.Length > 2)
-				{
-					s.ShowOBJ2 = GetSetting(2, luaParam);
-					s.ShowBG2 = GetSetting(3, luaParam);
-				}
-
-				pce.PutSettings(s);
-			}
-			else if (Emulator is SMS)
-			{
-				var sms = Emulator as SMS;
-				var s = sms.GetSettings();
-				s.DispOBJ = GetSetting(0, luaParam);
-				s.DispBG = GetSetting(1, luaParam);
-				sms.PutSettings(s);
-			}
-			else if (Emulator is WonderSwan)
-			{
-				var ws = Emulator as WonderSwan;
-				var s = ws.GetSettings();
-				s.EnableSprites = GetSetting(0, luaParam);
-				s.EnableFG = GetSetting(1, luaParam);
-				s.EnableBG = GetSetting(2, luaParam);
-				ws.PutSettings(s);
-			}
-		}
-
-		private static bool GetSetting(int index, bool[] settings)
-		{
-			if (index < settings.Length)
-			{
-				return settings[index];
-			}
-
-			return true;
-		}
-
-		[LuaMethodExample("emu.yield( );")]
-		[LuaMethod("yield", "allows a script to run while emulation is paused and interact with the gui/main window in realtime ")]
-		public void Yield()
-		{
-			YieldCallback();
-		}
-
-		[LuaMethodExample("local stemuget = emu.getdisplaytype();")]
-		[LuaMethod("getdisplaytype", "returns the display type (PAL vs NTSC) that the emulator is currently running in")]
-		public string GetDisplayType()
-		{
-			if (RegionableCore != null)
-			{
-				return RegionableCore.Region.ToString();
-			}
-
-			return "";
-		}
-
-		[LuaMethodExample("local stemuget = emu.getboardname();")]
-		[LuaMethod("getboardname", "returns (if available) the board name of the loaded ROM")]
-		public string GetBoardName()
-		{
-			if (BoardInfo != null)
-			{
-				return BoardInfo.BoardName;
-			}
-
-			return "";
-		}
-
-		[LuaMethod("getluacore", "returns the name of the Lua core currently in use")]
-		public string GetLuaBackend()
-		{
-			return Lua.WhichLua;
-		}
+		#endregion
 	}
 }

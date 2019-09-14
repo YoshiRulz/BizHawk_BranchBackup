@@ -3818,7 +3818,7 @@ namespace BizHawk.Client.EmuHawk
 						}
 					}
 
-					APIManager.Restart(Emulator.ServiceProvider);
+					GlobalWin.ApiProvider = APIManager.Restart(Emulator.ServiceProvider);
 					GlobalWin.Tools.Restart();
 
 					if (Global.Config.LoadCheatFileByGame)
@@ -3995,7 +3995,7 @@ namespace BizHawk.Client.EmuHawk
 				Global.Game = GameInfo.NullInstance;
 
 				GlobalWin.Tools.Restart();
-				APIManager.Restart(Emulator.ServiceProvider);
+				GlobalWin.ApiProvider = APIManager.Restart(Emulator.ServiceProvider);
 				RewireSound();
 				Text = $"BizHawk{(VersionInfo.DeveloperBuild ? " (interim) " : "")}";
 				HandlePlatformMenus();
