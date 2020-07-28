@@ -78,6 +78,8 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64
 
 		private void InitMemoryDomains()
 		{
+			return;
+
 			MakeMemoryDomain("RDRAM", mupen64plusApi.N64_MEMORY.RDRAM, MemoryDomain.Endian.Big, true);
 
 			MakeMemoryDomain("ROM", mupen64plusApi.N64_MEMORY.THE_ROM, MemoryDomain.Endian.Big, true);

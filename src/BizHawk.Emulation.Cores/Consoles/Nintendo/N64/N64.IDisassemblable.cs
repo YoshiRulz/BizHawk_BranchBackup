@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using BizHawk.Emulation.Common;
@@ -25,6 +26,8 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64
 
 		public string Disassemble(MemoryDomain m, uint addr, out int length)
 		{
+			throw new NotImplementedException();
+
 			length = 4; // TODO: is this right?
 			var instruction = m.PeekUint(addr, true);
 

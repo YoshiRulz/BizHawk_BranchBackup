@@ -90,10 +90,10 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64
 
 			// Order is important because the register with the mupen core
 			_videoProvider = new N64VideoProvider(api, videosettings);
-			_audioProvider = new N64Audio(api);
-			_inputProvider = new N64Input(this.AsInputPollable(), api, _syncSettings.Controllers);
+//			_audioProvider = new N64Audio(api);
+//			_inputProvider = new N64Input(this.AsInputPollable(), api, _syncSettings.Controllers);
 			(ServiceProvider as BasicServiceProvider).Register<IVideoProvider>(_videoProvider);
-			(ServiceProvider as BasicServiceProvider).Register<ISoundProvider>(_audioProvider.Resampler);
+//			(ServiceProvider as BasicServiceProvider).Register<ISoundProvider>(_audioProvider.Resampler);
 
 			switch (Region)
 			{
@@ -112,10 +112,10 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64
 			{
 				default:
 				case N64SyncSettings.RspType.Rsp_Hle:
-					rsp = "mupen64plus-rsp-hle.dll";
+					rsp = "mupen64plus-rsp-hle";
 					break;
 				//case N64SyncSettings.RspType.Rsp_cxd4:
-				//	rsp = "mupen64plus-rsp-cxd4.dll";
+				//	rsp = "mupen64plus-rsp-cxd4";
 				//	break;
 			}
 
@@ -220,14 +220,14 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64
 
 			IsVIFrame = false;
 
-			if (Tracer != null && Tracer.Enabled)
-			{
-				api.setTraceCallback(_tracecb);
-			}
-			else
-			{
-				api.setTraceCallback(null);
-			}
+//			if (Tracer != null && Tracer.Enabled)
+//			{
+//				api.setTraceCallback(_tracecb);
+//			}
+//			else
+//			{
+//				api.setTraceCallback(null);
+//			}
 
 			_audioProvider.RenderSound = rendersound;
 

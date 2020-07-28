@@ -10,6 +10,8 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64
 	{
 		public void SaveStateBinary(BinaryWriter writer)
 		{
+			throw new NotImplementedException();
+
 			byte[] data = SaveStatePrivateBuff;
 			int bytes_used = api.SaveState(data);
 
@@ -31,6 +33,8 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64
 
 		public void LoadStateBinary(BinaryReader reader)
 		{
+			throw new NotImplementedException();
+
 			int length = reader.ReadInt32();
 			if ((_disableExpansionSlot && length >= 16788288) || (!_disableExpansionSlot && length < 16788288))
 			{

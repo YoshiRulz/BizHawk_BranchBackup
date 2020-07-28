@@ -13,6 +13,8 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64
 
 		public void MakeTrace()
 		{
+			return;
+
 			var regs = GetCpuFlagsAndRegisters();
 			uint pc = (uint)regs["PC"].Value;
 			var length = 0;

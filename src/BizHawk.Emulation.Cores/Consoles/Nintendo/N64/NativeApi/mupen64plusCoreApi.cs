@@ -523,7 +523,7 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64.NativeApi
 
 			set_video_parameters(video_settings);
 
-			InitSaveram();
+//			InitSaveram();
 
 			// Initialize event invoker
 			m64pFrameCallback = new FrameCallback(FireFrameFinishedEvent);
@@ -594,8 +594,8 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64.NativeApi
 			m64pConfigOpenSection = GetCoreDelegate<ConfigOpenSection>("ConfigOpenSection");
 			m64pConfigSetParameter = GetCoreDelegate<ConfigSetParameter>("ConfigSetParameter");
 			m64pConfigSetParameterStr = GetCoreDelegate<ConfigSetParameterStr>("ConfigSetParameter");
-			m64pCoreSaveState = GetCoreDelegate<savestates_save_bkm>("savestates_save_bkm");
-			m64pCoreLoadState = GetCoreDelegate<savestates_load_bkm>("savestates_load_bkm");
+//			m64pCoreSaveState = GetCoreDelegate<savestates_save_bkm>("savestates_save_bkm");
+//			m64pCoreLoadState = GetCoreDelegate<savestates_load_bkm>("savestates_load_bkm");
 			m64pDebugMemGetPointer = GetCoreDelegate<DebugMemGetPointer>("DebugMemGetPointer");
 			m64pDebugSetCallbacks = GetCoreDelegate<DebugSetCallbacks>("DebugSetCallbacks");
 			m64pDebugBreakpointLookup = GetCoreDelegate<DebugBreakpointLookup>("DebugBreakpointLookup");
@@ -603,19 +603,19 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64.NativeApi
 			m64pDebugGetState = GetCoreDelegate<DebugGetState>("DebugGetState");
 			m64pDebugSetRunState = GetCoreDelegate<DebugSetRunState>("DebugSetRunState");
 			m64pDebugStep = GetCoreDelegate<DebugStep>("DebugStep");
-			m64pMemGetSize = GetCoreDelegate<MemGetSize>("MemGetSize");
-			m64pinit_saveram = GetCoreDelegate<init_saveram>("init_saveram");
-			m64psave_saveram = GetCoreDelegate<save_saveram>("save_saveram");
-			m64pload_saveram = GetCoreDelegate<load_saveram>("load_saveram");
+//			m64pMemGetSize = GetCoreDelegate<MemGetSize>("MemGetSize");
+//			m64pinit_saveram = GetCoreDelegate<init_saveram>("init_saveram");
+//			m64psave_saveram = GetCoreDelegate<save_saveram>("save_saveram");
+//			m64pload_saveram = GetCoreDelegate<load_saveram>("load_saveram");
 
-			m64pSetTraceCallback = GetCoreDelegate<SetTraceCallback>("SetTraceCallback");
+//			m64pSetTraceCallback = GetCoreDelegate<SetTraceCallback>("SetTraceCallback");
 
-			m64pGetRegisters = GetCoreDelegate<GetRegisters>("GetRegisters");
+//			m64pGetRegisters = GetCoreDelegate<GetRegisters>("GetRegisters");
 
-			m64p_read_memory_8 = GetCoreDelegate<biz_read_memory>("biz_read_memory");
-			m64p_write_memory_8 = GetCoreDelegate<biz_write_memory>("biz_write_memory");
+//			m64p_read_memory_8 = GetCoreDelegate<biz_read_memory>("biz_read_memory");
+//			m64p_write_memory_8 = GetCoreDelegate<biz_write_memory>("biz_write_memory");
 
-			m64p_decode_op = GetCoreDelegate<biz_r4300_decode_op>("biz_r4300_decode_op");
+//			m64p_decode_op = GetCoreDelegate<biz_r4300_decode_op>("biz_r4300_decode_op");
 		}
 
 		/// <summary>
@@ -956,7 +956,7 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64.NativeApi
 				}
 
 				// Backup the saveram in case bizhawk wants to get at is after we've freed the libraries
-				saveram_backup = SaveSaveram();
+//				saveram_backup = SaveSaveram();
 
 				DetachPlugin(m64p_plugin_type.M64PLUGIN_GFX);
 				DetachPlugin(m64p_plugin_type.M64PLUGIN_AUDIO);
@@ -984,7 +984,7 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64.NativeApi
 		{
 			static IntPtr GetDLIRPtrByRefl(DynamicLibraryImportResolver dlir) => (IntPtr) fiDLIRInternalPtr.GetValue(dlir);
 			if (plugins.ContainsKey(type)) DetachPlugin(type);
-			var lib = new DynamicLibraryImportResolver(PluginName);
+			var lib = new DynamicLibraryImportResolver(OSTailoredCode.IsUnixHost ? $"{PluginName}.so" : $"{PluginName}.dll");
 			var libPtr = GetDLIRPtrByRefl(lib);
 			GetTypedDelegate<PluginStartup>(libPtr, "PluginStartup")(GetDLIRPtrByRefl(Library), null, null);
 			if (m64pCoreAttachPlugin(type, libPtr) != m64p_error.M64ERR_SUCCESS)

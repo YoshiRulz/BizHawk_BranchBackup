@@ -1,4 +1,6 @@
-﻿using BizHawk.Emulation.Common;
+﻿using System;
+
+using BizHawk.Emulation.Common;
 
 namespace BizHawk.Emulation.Cores.Nintendo.N64
 {
@@ -6,11 +8,13 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64
 	{
 		public byte[] CloneSaveRam()
 		{
+			throw new NotImplementedException();
 			return api.SaveSaveram();
 		}
 
 		public void StoreSaveRam(byte[] data)
 		{
+			return;
 			api.LoadSaveram(data);
 		}
 

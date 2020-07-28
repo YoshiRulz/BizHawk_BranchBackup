@@ -43,21 +43,21 @@ namespace BizHawk.Emulation.Cores.Nintendo.N64.NativeApi
 			{
 				default:
 				case PluginType.Rice:
-					videoplugin = "mupen64plus-video-rice.dll";
+					videoplugin = "mupen64plus-video-rice";
 					break;
 				case PluginType.Glide:
-					videoplugin = "mupen64plus-video-glide64.dll";
+					videoplugin = "mupen64plus-video-glide64";
 					break;
 				case PluginType.GlideMk2:
-					videoplugin = "mupen64plus-video-glide64mk2.dll";
+					videoplugin = "mupen64plus-video-glide64mk2";
 					break;
 				case PluginType.GLideN64:
-					videoplugin = "mupen64plus-video-GLideN64.dll";
+					videoplugin = "mupen64plus-video-GLideN64";
 					break;
 			}
 
 			GfxDll = core.AttachPlugin(mupen64plusApi.m64p_plugin_type.M64PLUGIN_GFX,
-				videoplugin);
+				OSTailoredCode.IsUnixHost ? "mupen64plus-video-glide64mk2" : videoplugin);
 			GFXReadScreen2 = mupen64plusApi.GetTypedDelegate<ReadScreen2>(GfxDll, "ReadScreen2");
 			GFXReadScreen2Res = mupen64plusApi.GetTypedDelegate<ReadScreen2Res>(GfxDll, "ReadScreen2");
 			var funcPtr = OSTailoredCode.LinkedLibManager.GetProcAddrOrZero(GfxDll, "GetScreenTextureID");
