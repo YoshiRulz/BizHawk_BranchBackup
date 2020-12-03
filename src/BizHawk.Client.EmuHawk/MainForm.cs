@@ -634,6 +634,19 @@ namespace BizHawk.Client.EmuHawk
 				}
 #endif
 			}
+
+			Load += (loadSender, loadArgs) =>
+			{
+				try
+				{
+					using var moonConsole = new MoonConsoleForm();
+					moonConsole.ShowDialog();
+				}
+				catch (Exception)
+				{
+					Console.WriteLine(e);
+				}
+			};
 		}
 
 		private readonly bool _suppressSyncSettingsWarning;

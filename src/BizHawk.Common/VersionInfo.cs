@@ -13,6 +13,12 @@ namespace BizHawk.Common
 		/// </remarks>
 		public static readonly string MainVersion = "2.5.3";
 
+		/// <remarks>
+		/// Bump as <see cref="MainVersion"/>.
+		/// Used in MoonHawk to determine whether a script should be run on a dev build without a compat layer.
+		/// </remarks>
+		public static readonly string PreviousReleaseVersion = "2.5.2";
+
 		public static readonly string ReleaseDate = "September 12, 2020";
 
 		public static readonly string HomePage = "http://tasvideos.org/BizHawk.html";
