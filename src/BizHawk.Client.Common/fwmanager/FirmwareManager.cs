@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.IO;
 using System.Linq;
@@ -29,6 +30,38 @@ namespace BizHawk.Client.Common
 			_firmwareSizes = new HashSet<long>(FirmwareDatabase.FirmwareFiles.Select(ff => ff.Size)); // build a list of expected file sizes, used as a simple filter to speed up scanning
 		}
 
+		private ResolutionInfo? AttemptPatch(FirmwareRecord requested, PathEntryCollection pathEntries, IDictionary<string, string> userSpecifications)
+		{
+			// look for patchsets where 1. they produce a file that fulfils the request, and 2. a matching input file is present in the firmware dir
+			var targetOptionHashes = FirmwareDatabase.FirmwareOptions.Where(fo => fo.ID == requested.ID).Select(fo => fo.Hash).ToList();
+			var presentBaseFiles = _resolutionDictionary.Values.Select(ri => ri.Hash).ToList(); //TODO might want to use files which are known (in the database), but not assigned to any record
+			var patchOption = FirmwareDatabase.AllPatches.FirstOrNull(fpo => targetOptionHashes.Contains(fpo.TargetHash) && presentBaseFiles.Contains(fpo.BaseHash));
+			if (patchOption is null) return null;
+			// found one -- read and patch the base file
+			var baseFilename = _resolutionDictionary.Values.First(ri => ri.Hash == patchOption.Value.BaseHash).FilePath!;
+			var patched = patchOption.Value.Patches.Aggregate(seed: File.ReadAllBytes(baseFilename), (a, fpd) => fpd.ApplyToMutating(a));
+			// sanity check
+			using var sha1 = SHA1.Create();
+			sha1.ComputeHash(patched);
+			var targetHash = patchOption.Value.TargetHash;
+			Trace.Assert(sha1.Hash.BytesToHexString() == targetHash);
+			// save the patched file to disk
+			var patchedParentDir = Path.Combine(pathEntries["Global", "Temp Files"].Path, "auto_patched_firmware");
+			Directory.CreateDirectory(patchedParentDir);
+			var ff = FirmwareDatabase.FirmwareFilesByHash[targetHash];
+			var patchedFilePath = Path.Combine(patchedParentDir, ff.RecommendedName);
+			File.WriteAllBytes(patchedFilePath, patched);
+			// cache and return this new file's metadata
+			userSpecifications[requested.ID.ConfigKey] = patchedFilePath;
+			return _resolutionDictionary[requested] = new()
+			{
+				FilePath = patchedFilePath,
+				KnownFirmwareFile = ff,
+				Hash = targetHash,
+				Size = patched.Length
+			};
+		}
+
 		/// <remarks>
 		/// Sometimes this is called from a loop in <c>FirmwaresConfig.DoScan</c>.
 		/// In that case, we don't want to call <see cref="DoScanAndResolve"/> repeatedly, so we use <paramref name="forbidScan"/> to skip it.
@@ -48,10 +81,9 @@ namespace BizHawk.Client.Common
 		// Requests the specified firmware. tries really hard to scan and resolve as necessary
 		public string? Request(PathEntryCollection pathEntries, IDictionary<string, string> userSpecifications, FirmwareID id)
 		{
-			var resolved = Resolve(
-				pathEntries,
-				userSpecifications,
-				FirmwareDatabase.FirmwareRecords.First(fr => fr.ID == id));
+			var requestedRecord = FirmwareDatabase.FirmwareRecords.First(fr => fr.ID == id);
+			var resolved = Resolve(pathEntries, userSpecifications, requestedRecord)
+				?? AttemptPatch(requestedRecord, pathEntries, userSpecifications);
 			if (resolved == null) return null;
 			RecentlyServed.Add(new(id, resolved.Hash, resolved.Size));
 			return resolved.FilePath;
