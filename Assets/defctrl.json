@@ -1382,7 +1382,7 @@
 	"AllTrollersFeedbacks": {
 		"Nintendo 64 Controller": {
 			"P1 Rumble Pak": {
-				"Channel": "Left+Right",
+				"Channels": "Left+Right",
 				"GamepadPrefix": "X1 ",
 				"Prescale": 1.0
 			}
