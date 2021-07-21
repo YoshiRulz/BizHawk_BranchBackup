@@ -108,12 +108,10 @@ namespace BizHawk.Client.Common
 		{
 			foreach (var kvp in _feedbackBindings)
 			{
-				if (_haptics.TryGetValue(kvp.Key, out var strength))
+				if (kvp.Value.IsZeroed || !_haptics.TryGetValue(kvp.Key, out var strength)) continue;
+				foreach (var hostChannel in kvp.Value.Channels!.Split('+'))
 				{
-					foreach (var hostChannel in kvp.Value.Channels!.Split('+'))
-					{
-						finalHostController.SetHapticChannelStrength(kvp.Value.GamepadPrefix + hostChannel, (int) ((double) strength * kvp.Value.Prescale));
-					}
+					finalHostController.SetHapticChannelStrength(kvp.Value.GamepadPrefix + hostChannel, (int) ((double) strength * kvp.Value.Prescale));
 				}
 			}
 		}
