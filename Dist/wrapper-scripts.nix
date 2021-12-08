@@ -14,7 +14,7 @@
 , initConfig # pretend this is JSON; the following env. vars will be substituted by the wrapper script (if surrounded by double-percent e.g. `%%BIZHAWK_DATA_HOME%%`): `BIZHAWK_DATA_HOME`
 }:
 let
-	glHackLibs = rec {
+	glHackLibs = builtins.mapAttrs (k: v: builtins.concatStringsSep " " v) (rec {
 		Fedora_33 = [
 			"libdrm_amdgpu.so.1" "libdrm_nouveau.so.2" "libdrm_radeon.so.1" "libedit.so.0" "libelf.so.1" "libffi.so.6" "libLLVM-11.so" "libtinfo.so.6" "libvulkan.so.1"
 		];
@@ -24,8 +24,7 @@ let
 		LinuxMint_20_2 = [ # should match Ubuntu 20.04 and similar distros
 			"libbsd.so.0" "libedit.so.2" "libLLVM-12.so.1" "libtinfo.so.6"
 		] ++ Manjaro_21_0_3; #TODO split
-	};
-	glHackLibsFlat = lib.unique (lib.flatten (builtins.attrValues glHackLibs));
+	});
 	initConfigFile = writeText "config.json" (builtins.toJSON ({
 		LastWrittenFrom = if builtins.length (builtins.splitVersion hawkVersion) < 3 then "${hawkVersion}.0" else hawkVersion;
 		PathEntries = {
@@ -76,21 +75,48 @@ in rec {
 			BIZHAWK_GLHACKDIR="$HOME/.local/state"
 		fi
 		export BIZHAWK_GLHACKDIR="$BIZHAWK_GLHACKDIR/emuhawk-monort-${hawkVersion}-non-nixos"
-		mkdir -p "$BIZHAWK_GLHACKDIR"
-		if [ ! -e "$BIZHAWK_GLHACKDIR/libGLX_indirect.so.0" ]; then
-			ln -fsvT "${lib.getOutput "drivers" mesa}/lib/libGLX_mesa.so.0" "$BIZHAWK_GLHACKDIR/libGLX_indirect.so.0"
+
+		thisScriptPath="${builtins.placeholder "out"}"
+		if [ -e "$BIZHAWK_GLHACKDIR/populated_by_script" ]; then
+			# symlinks have been set up already, check it was by this version of the script
+			if [ "$(realpath "$BIZHAWK_GLHACKDIR/populated_by_script")" != "$thisScriptPath" ]; then
+				rm "$BIZHAWK_GLHACKDIR/populated_by_script" # next step will remove the rest of the files
+			fi
 		fi
-		# collect links to certain GL libs (and their deps) from host, added to LD_LIBRARY_PATH without polluting it with all libs from host
-		for l in ${builtins.concatStringsSep " " glHackLibsFlat}; do
-			if [ -e "$BIZHAWK_GLHACKDIR/$l" ]; then continue; fi
-			# else it's either a broken link or it doesn't exist, we use ln -f to cover both
-			for d in /usr/lib64 /usr/lib /usr/lib/x86_64-linux-gnu /lib64 /lib; do
-				if [ -e "$d/$l" ]; then
-					ln -fsvT "$d/$l" "$BIZHAWK_GLHACKDIR/$l"
-					break
-				fi
+		if [ ! -e "$BIZHAWK_GLHACKDIR/populated_by_script" ]; then
+			# either a broken link or it doesn't exist, start over
+			printf "creating/recreating %s\n" "$BIZHAWK_GLHACKDIR"
+			rm -fr "$BIZHAWK_GLHACKDIR"
+			mkdir -p "$BIZHAWK_GLHACKDIR"
+			ln -sT "$thisScriptPath" "$BIZHAWK_GLHACKDIR/populated_by_script" # does not register GC root!
+
+			# symlink Nix-installed mesa for OpenTK, in such a way that it loads the libs and drivers we set up below and not Nix-installed ones (which won't work on non-NixOS)
+			ln -svT "${lib.getOutput "drivers" mesa}/lib/libGLX_mesa.so.0" "$BIZHAWK_GLHACKDIR/libGLX_indirect.so.0"
+
+			# symlink a bunch of libs (libGL and deps) from host in one dir, which can be added to LD_LIBRARY_PATH without it being polluted by other libs from host
+			if [ "$(command -v lsb_release)" ]; then
+				case "$(lsb_release -i | cut -c17- | tr -d "\n")" in
+					"Arch"|"Artix"|"ManjaroLinux") libsToLink="${glHackLibs.Manjaro_21_0_3}";;
+					"Fedora") libsToLink="${glHackLibs.Fedora_33}";;
+					"Debian"|"LinuxMint"|"Pop"|"Ubuntu") libsToLink="${glHackLibs.LinuxMint_20_2}";;
+				esac
+			else
+				printf "could not find lsb_release in PATH (install via host package manager, not Nix)\n"
+			fi
+			if [ -z "$libsToLink" ]; then
+				printf "distro unknown or undetermined, assuming Arch/Manjaro\n"
+				libsToLink="${glHackLibs.Manjaro_21_0_3}"
+			fi
+			for l in $libsToLink; do
+				# could specify this in the distro case-esac too, but there's no benefit
+				for d in /usr/lib64 /usr/lib /usr/lib/x86_64-linux-gnu /lib64 /lib; do
+					if [ -e "$d/$l" ]; then
+						ln -svT "$d/$l" "$BIZHAWK_GLHACKDIR/$l"
+						break
+					fi
+				done
 			done
-		done
+		fi
 
 		for d in /usr/lib64/dri /usr/lib/dri /usr/lib/x86_64-linux-gnu/dri; do
 			if [ -e "$d" ]; then
