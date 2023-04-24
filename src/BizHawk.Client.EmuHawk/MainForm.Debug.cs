@@ -27,6 +27,8 @@ namespace BizHawk.Client.EmuHawk
 			void OpenTool<T>() where T : class, IToolForm => Tools.Load<T>();
 			ToolStripMenuItemEx firmwareAutopatchDebugItem = new() { Text = FirmwareAutopatchDebugToolForm.TOOL_NAME };
 			firmwareAutopatchDebugItem.Click += (_, _) => OpenTool<FirmwareAutopatchDebugToolForm>();
+			ToolStripMenuItemEx diztinGUIshIPCDebugItem = new() { Text = DiztinGUIshIPCToolForm.TOOL_NAME };
+			diztinGUIshIPCDebugItem.Click += (_, _) => OpenTool<DiztinGUIshIPCToolForm>();
 			ToolStripMenuItemEx debugMenu = new()
 			{
 				DropDownItems =
@@ -39,6 +41,7 @@ namespace BizHawk.Client.EmuHawk
 						},
 						Text = "Firmware",
 					},
+					new ToolStripMenuItemEx { DropDownItems = { diztinGUIshIPCDebugItem }, Text = "DiztinGUIsh" }, //TODO move to SNES sysID submenu
 					new ToolStripSeparatorEx(),
 					new DebugVSystemMenuItem(VSystemID.Raw.GB, VSystemID.Raw.GBC)
 					{
