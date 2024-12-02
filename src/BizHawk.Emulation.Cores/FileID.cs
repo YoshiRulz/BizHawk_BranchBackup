@@ -129,7 +129,7 @@ namespace BizHawk.Emulation.Cores
 			public DiscSystem.Disc Disc;
 		}
 
-		private class IdentifyJob
+		private sealed class IdentifyJob
 		{
 			public Stream Stream;
 			public string Extension;
@@ -242,7 +242,7 @@ namespace BizHawk.Emulation.Cores
 			}
 		}
 
-		private class SimpleMagicRecord
+		private sealed class SimpleMagicRecord
 		{
 			public int Offset;
 			public string Key;
@@ -299,7 +299,7 @@ namespace BizHawk.Emulation.Cores
 			};
 		}
 
-		private class ExtensionInfo
+		private sealed class ExtensionInfo
 		{
 			public ExtensionInfo(FileIDType defaultForExtension, FormatTester tester)
 			{

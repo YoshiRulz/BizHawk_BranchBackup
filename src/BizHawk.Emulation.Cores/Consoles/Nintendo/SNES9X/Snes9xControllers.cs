@@ -81,7 +81,7 @@ namespace BizHawk.Emulation.Cores.Nintendo.SNES9X
 			void ApplyState(IController controller, short[] input, int offset);
 		}
 
-		private class Joypad : IControlDevice
+		private sealed class Joypad : IControlDevice
 		{
 			private static readonly string[] Buttons =
 			{
@@ -129,7 +129,7 @@ namespace BizHawk.Emulation.Cores.Nintendo.SNES9X
 			}
 		}
 
-		private class Mouse : Analog
+		private sealed class Mouse : Analog
 		{
 			private static readonly ControllerDefinition _definition
 				= new ControllerDefinition("(SNES Controller fragment)") { BoolButtons = { "0Mouse Left", "0Mouse Right" } }
@@ -138,7 +138,7 @@ namespace BizHawk.Emulation.Cores.Nintendo.SNES9X
 			public override ControllerDefinition Definition => _definition;
 		}
 
-		private class SuperScope : Analog
+		private sealed class SuperScope : Analog
 		{
 			private static readonly ControllerDefinition _definition
 				= new ControllerDefinition("(SNES Controller fragment)") { BoolButtons = { "0Trigger", "0Cursor", "0Turbo", "0Pause", "0Offscreen" } }
@@ -147,7 +147,7 @@ namespace BizHawk.Emulation.Cores.Nintendo.SNES9X
 			public override ControllerDefinition Definition => _definition;
 		}
 
-		private class Justifier : Analog
+		private sealed class Justifier : Analog
 		{
 			private static readonly ControllerDefinition _definition
 				= new ControllerDefinition("(SNES Controller fragment)") { BoolButtons = { "0Trigger", "0Start", "0Offscreen" } }

@@ -7,10 +7,10 @@ using BizHawk.Common.StringExtensions;
 
 namespace BizHawk.Emulation.DiscSystem
 {
-	internal class AudioDecoder
+	internal sealed class AudioDecoder
 	{
 		[Serializable]
-		public class AudioDecoder_Exception : Exception
+		public sealed class AudioDecoder_Exception : Exception
 		{
 			public AudioDecoder_Exception(string message)
 				: base(message)

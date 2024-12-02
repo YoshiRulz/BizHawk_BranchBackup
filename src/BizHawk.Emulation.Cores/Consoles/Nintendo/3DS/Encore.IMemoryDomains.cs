@@ -54,7 +54,7 @@ namespace BizHawk.Emulation.Cores.Consoles.Nintendo.N3DS
 			WireDomain(LibEncore.MemoryRegion.N3DS, _n3dsExRam);
 		}
 
-		private class EncoreMMU : MemoryDomain
+		private sealed class EncoreMMU : MemoryDomain
 		{
 			private const uint ENCORE_PAGE_SIZE = 0x1000;
 			private const uint ENCORE_PAGE_MASK = ENCORE_PAGE_SIZE - 1;

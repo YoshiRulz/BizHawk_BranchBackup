@@ -13,7 +13,7 @@ namespace BizHawk.Client.EmuHawk
 		Hex,
 	}
 
-	internal class LuaTextBox : TextBox
+	internal sealed class LuaTextBox : TextBox
 	{
 		private BoxType _boxType = BoxType.All;
 
