@@ -199,7 +199,7 @@ namespace BizHawk.Client.EmuHawk
 			bool Matches(ListViewItem value);
 		}
 
-		private class SimpleMatcher : IMatcher
+		private sealed class SimpleMatcher : IMatcher
 		{
 			public string[] Keys { get; set; }
 			public bool Matches(ListViewItem value)
@@ -217,7 +217,7 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
-		private class RegExMatcher : IMatcher
+		private sealed class RegExMatcher : IMatcher
 		{
 			public Regex Matcher { get; set; }
 			public bool Matches(ListViewItem value)

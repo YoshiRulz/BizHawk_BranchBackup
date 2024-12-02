@@ -222,7 +222,7 @@ namespace BizHawk.Emulation.Cores.Nintendo.SNES
 
 		public bool IsSGB { get; }
 
-		private class SGBBoardInfo : IBoardInfo
+		private sealed class SGBBoardInfo : IBoardInfo
 		{
 			public string BoardName => "SGB";
 		}
