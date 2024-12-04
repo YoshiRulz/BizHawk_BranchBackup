@@ -2071,9 +2071,8 @@ namespace BizHawk.Client.EmuHawk
 			for (var i = 0; i < sysID.Length; i++)
 			{
 				var upper = char.ToUpperInvariant(sysID[i]);
-				if (AvailableAccelerators.Contains(upper))
+				if (AvailableAccelerators.Remove(upper))
 				{
-					AvailableAccelerators.Remove(upper);
 					sysID = sysID.Insert(i, "&");
 					break;
 				}

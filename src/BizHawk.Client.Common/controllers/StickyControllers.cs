@@ -74,14 +74,7 @@ namespace BizHawk.Client.Common
 		{
 			foreach (var button in buttons.Where(button => !_justPressed.Contains(button)))
 			{
-				if (_buttonHolds.Contains(button))
-				{
-					_buttonHolds.Remove(button);
-				}
-				else
-				{
-					_buttonHolds.Add(button);
-				}
+				if (!_buttonHolds.Remove(button)) _buttonHolds.Add(button);
 			}
 
 			_justPressed = buttons;
