@@ -6,7 +6,7 @@ namespace BizHawk.Client.Common
 {
 	public class ZipStateSaver : IDisposable
 	{
-		private readonly IZipWriter _zip;
+		private readonly FrameworkZipWriter _zip;
 		private bool _isDisposed;
 
 		private static void WriteZipVersion(Stream s)
@@ -51,7 +51,7 @@ namespace BizHawk.Client.Common
 			// don't zstd compress text, as it's annoying for users
 			PutLump(lump, s =>
 			{
-				TextWriter tw = new StreamWriter(s);
+				StreamWriter tw = new(s);
 				callback(tw);
 				tw.Flush();
 			}, false);

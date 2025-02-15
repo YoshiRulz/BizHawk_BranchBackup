@@ -413,7 +413,7 @@ namespace BizHawk.Emulation.Cores
 			};
 		}
 
-		private static PadSchema ConsoleButtons(Octoshock octo)
+		private static ConsoleSchema ConsoleButtons(Octoshock octo)
 		{
 			return new ConsoleSchema
 			{
@@ -426,7 +426,7 @@ namespace BizHawk.Emulation.Cores
 			};
 		}
 
-		private static PadSchema NymaConsoleButtons(AxisSpec diskRange)
+		private static ConsoleSchema NymaConsoleButtons(AxisSpec diskRange)
 		{
 			return new ConsoleSchema
 			{

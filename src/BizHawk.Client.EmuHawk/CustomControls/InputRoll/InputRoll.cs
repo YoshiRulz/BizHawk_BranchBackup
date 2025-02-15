@@ -20,7 +20,7 @@ namespace BizHawk.Client.EmuHawk
 	// Row width is specified for horizontal orientation
 	public partial class InputRoll : Control
 	{
-		private readonly IControlRenderer _renderer;
+		private readonly GdiPlusRenderer _renderer;
 
 		private CellList _selectedItems = new();
 

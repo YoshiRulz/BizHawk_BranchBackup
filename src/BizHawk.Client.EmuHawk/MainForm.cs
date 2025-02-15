@@ -2042,7 +2042,7 @@ namespace BizHawk.Client.EmuHawk
 				&& t.GetCustomAttribute<SpecializedToolAttribute>() is not null)
 			.ToList();
 
-		private ISet<char> _availableAccelerators;
+		private HashSet<char> _availableAccelerators;
 
 		private ISet<char> AvailableAccelerators
 		{
