@@ -366,39 +366,41 @@ namespace BizHawk.Emulation.Cores.Computers.DOS
 			// Setting mouse inputs
 			if (_syncSettings.EnableMouse)
 			{
+				// Getting new mouse state values
+				var nextState = new DOSBox.MouseState()
+				{
+					posX = controller.AxisValue($"{Inputs.Mouse} {MouseInputs.PosX}"),
+					posY = controller.AxisValue($"{Inputs.Mouse} { MouseInputs.PosY}"),
+					leftButtonHeld = controller.IsPressed($"{Inputs.Mouse} {MouseInputs.LeftButton}"),
+					middleButtonHeld = controller.IsPressed($"{Inputs.Mouse} {MouseInputs.MiddleButton}"),
+					rightButtonHeld = controller.IsPressed($"{Inputs.Mouse} {MouseInputs.RightButton}"),
+				};
+
 				// 272 is minimal delta for RMouse on my machine, this will be obsolete when global sensitivity for RMouse is added and when it's bindable from GUI
 				var deltaX = controller.AxisValue($"{Inputs.Mouse} {MouseInputs.SpeedX}") / 272;
 				var deltaY = controller.AxisValue($"{Inputs.Mouse} {MouseInputs.SpeedY}") / 272;
-				fi.mouse.posX = controller.AxisValue($"{Inputs.Mouse} {MouseInputs.PosX}");
-				fi.mouse.posY = controller.AxisValue($"{Inputs.Mouse} { MouseInputs.PosY}");
-				fi.mouse.dX = deltaX != 0 ? deltaX : fi.mouse.posX - _mouseState.posX;
-				fi.mouse.dY = deltaY != 0 ? deltaY : fi.mouse.posY - _mouseState.posY;
+				fi.mouse.dX = deltaX != 0 ? deltaX : nextState.posX - _mouseState.posX;
+				fi.mouse.dY = deltaY != 0 ? deltaY : nextState.posY - _mouseState.posY;
+				fi.mouse.posX = nextState.posX;
+				fi.mouse.posY = nextState.posY;
 
 				// Button pressed criteria:
 				// If the input is made in this frame and the button is not held from before
-				fi.mouse.leftButtonPressed = controller.IsPressed($"{Inputs.Mouse} {MouseInputs.LeftButton}") && !_mouseState.leftButtonHeld ? 1 : 0;
-				fi.mouse.middleButtonPressed = controller.IsPressed($"{Inputs.Mouse} {MouseInputs.MiddleButton}") && !_mouseState.middleButtonHeld ? 1 : 0;
-				fi.mouse.rightButtonPressed = controller.IsPressed($"{Inputs.Mouse} {MouseInputs.RightButton}") && !_mouseState.rightButtonHeld ? 1 : 0;
+				fi.mouse.leftButtonPressed = !_mouseState.leftButtonHeld && nextState.leftButtonHeld ? 1 : 0;
+				fi.mouse.middleButtonPressed = !_mouseState.middleButtonHeld && nextState.middleButtonHeld ? 1 : 0;
+				fi.mouse.rightButtonPressed = !_mouseState.rightButtonHeld && nextState.rightButtonHeld ? 1 : 0;
 
 				// Button released criteria:
 				// If the input is not pressed in this frame and the button is held from before
-				fi.mouse.leftButtonReleased = !controller.IsPressed($"{Inputs.Mouse} {MouseInputs.LeftButton}") && _mouseState.leftButtonHeld ? 1 : 0;
-				fi.mouse.middleButtonReleased = !controller.IsPressed($"{Inputs.Mouse} {MouseInputs.MiddleButton}") && _mouseState.middleButtonHeld ? 1 : 0;
-				fi.mouse.rightButtonReleased = !controller.IsPressed($"{Inputs.Mouse} {MouseInputs.RightButton}") && _mouseState.rightButtonHeld ? 1 : 0;
+				fi.mouse.leftButtonReleased = _mouseState.leftButtonHeld && !nextState.leftButtonHeld ? 1 : 0;
+				fi.mouse.middleButtonReleased = _mouseState.middleButtonHeld && !nextState.middleButtonHeld ? 1 : 0;
+				fi.mouse.rightButtonReleased = _mouseState.rightButtonHeld && !nextState.rightButtonHeld ? 1 : 0;
 				fi.mouse.sensitivity = _syncSettings.MouseSensitivity;
 
-				// Getting new mouse state values
-				var nextState = new DOSBox.MouseState();
-				nextState.posX = fi.mouse.posX;
-				nextState.posY = fi.mouse.posY;
-				if (fi.mouse.leftButtonPressed > 0) nextState.leftButtonHeld = true;
-				if (fi.mouse.middleButtonPressed > 0) nextState.middleButtonHeld = true;
-				if (fi.mouse.rightButtonPressed > 0) nextState.rightButtonHeld = true;
-				if (fi.mouse.leftButtonReleased > 0) nextState.leftButtonHeld = false;
-				if (fi.mouse.middleButtonReleased > 0) nextState.middleButtonHeld = false;
-				if (fi.mouse.rightButtonReleased > 0) nextState.rightButtonHeld = false;
-
 				// Updating mouse state
+				nextState.leftButtonHeld &= fi.mouse.leftButtonReleased is not 0; // necessary?
+				nextState.middleButtonHeld &= fi.mouse.middleButtonReleased is not 0;
+				nextState.rightButtonHeld &= fi.mouse.rightButtonReleased is not 0;
 				_mouseState = nextState;
             }
 
