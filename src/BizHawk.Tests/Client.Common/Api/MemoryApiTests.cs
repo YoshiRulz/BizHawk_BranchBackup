@@ -9,7 +9,7 @@ namespace BizHawk.Tests.Client.Common.Api
 	[TestClass]
 	public sealed class MemoryApiTests
 	{
-		private IMemoryApi CreateDummyApi(byte[] memDomainContents)
+		private MemoryApi CreateDummyApi(byte[] memDomainContents)
 			=> new MemoryApi(Console.WriteLine) //TODO capture and check for error messages?
 			{
 				MemoryDomainCore = new MemoryDomainList(new MemoryDomain[]
