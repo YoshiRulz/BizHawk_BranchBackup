@@ -220,47 +220,47 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 					tdb.AddMetaData(BlockDescriptorTitle.Undefined, description);
 				}
 				/*
-                if (blockdata[0] == 0x00 && blockSize == 19 && (blockdata[1] == 0x00) || blockdata[1] == 3)
-                {
-                    // This is the PROGRAM header
-                    // take the 10 filename bytes (that start at offset 2)
-                    programData = blockdata.Skip(2).Take(10).ToArray();
+				if (blockdata[0] == 0x00 && blockSize == 19 && (blockdata[1] == 0x00) || blockdata[1] == 3)
+				{
+					// This is the PROGRAM header
+					// take the 10 filename bytes (that start at offset 2)
+					programData = blockdata.Skip(2).Take(10).ToArray();
 
-                    // get the filename as a string (with padding removed)
-                    string fileName = Encoding.ASCII.GetString(programData).Trim();
+					// get the filename as a string (with padding removed)
+					string fileName = Encoding.ASCII.GetString(programData).Trim();
 
-                    // get the type
-                    string type = "";
-                    if (blockdata[0] == 0x00)
-                    {
-                        type = "Program";
-                    }
-                    else
-                    {
-                        type = "Bytes";
-                    }
+					// get the type
+					string type = "";
+					if (blockdata[0] == 0x00)
+					{
+						type = "Program";
+					}
+					else
+					{
+						type = "Bytes";
+					}
 
-                    // now build the description string
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append(type + ": ");
-                    sb.Append(fileName + " ");
-                    sb.Append(GetWordValue(blockdata, 14));
-                    sb.Append(':');
-                    sb.Append(GetWordValue(blockdata, 12));
-                    description = sb.ToString();
-                }
-                else if (blockdata[0] == 0xFF)
-                {
-                    // this is a data block
-                    description = "Data Block " + (blockSize - 2) + "bytes";
-                }
-                else
-                {
-                    // other type
-                    description = $"#{blockdata[0]:X2} block, {blockSize - 2} bytes";
-                    description += (crc != 0) ? $", crc bad (#{crcFile:X2}!=#{crcValue:X2})" : ", crc ok";
-                }
-                */
+					// now build the description string
+					StringBuilder sb = new StringBuilder();
+					sb.Append(type + ": ");
+					sb.Append(fileName + " ");
+					sb.Append(GetWordValue(blockdata, 14));
+					sb.Append(':');
+					sb.Append(GetWordValue(blockdata, 12));
+					description = sb.ToString();
+				}
+				else if (blockdata[0] == 0xFF)
+				{
+					// this is a data block
+					description = "Data Block " + (blockSize - 2) + "bytes";
+				}
+				else
+				{
+					// other type
+					description = $"#{blockdata[0]:X2} block, {blockSize - 2} bytes";
+					description += (crc != 0) ? $", crc bad (#{crcFile:X2}!=#{crcValue:X2})" : ", crc ok";
+				}
+				*/
 
 				tdb.BlockDescription = BlockType.Standard_Speed_Data_Block;
 

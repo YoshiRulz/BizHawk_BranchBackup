@@ -178,30 +178,30 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 			}
 
 			/*
-            _noiseVal = 0x0FFFF;
-            _outABC = 0;
-            _outNoiseABC = 0;
-            _counterNoise = 0;
-            _counterA = 0;
-            _counterB = 0;
-            _counterC = 0;
-            _EnvelopeCounterBend = 0;
+			_noiseVal = 0x0FFFF;
+			_outABC = 0;
+			_outNoiseABC = 0;
+			_counterNoise = 0;
+			_counterA = 0;
+			_counterB = 0;
+			_counterC = 0;
+			_EnvelopeCounterBend = 0;
 
-            // clear all the registers
-            for (int i = 0; i < 14; i++)
-            {
-                SelectedRegister = i;
-                PortWrite(0);
-            }
+			// clear all the registers
+			for (int i = 0; i < 14; i++)
+			{
+				SelectedRegister = i;
+				PortWrite(0);
+			}
 
-            randomSeed = 1;
+			randomSeed = 1;
 
-            // number of frames to update
-            var fr = (_audioBufferIndex * _tStatesPerFrame) / _audioBuffer.Length;
+			// number of frames to update
+			var fr = (_audioBufferIndex * _tStatesPerFrame) / _audioBuffer.Length;
 
-            // update the audio buffer
-            BufferUpdate(fr);
-            */
+			// update the audio buffer
+			BufferUpdate(fr);
+			*/
 		}
 
 		/// <summary>
@@ -490,20 +490,20 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 		/// </summary>
 		private static readonly List<uint[]> PanTabs = new List<uint[]>
 		{
-            // MONO
-            new uint[] { 50,50, 50,50, 50,50 },
-            // ABC
-            new uint[] { 100,10,  66,66,   10,100 },
-            // ACB
-            new uint[] { 100,10,  10,100,  66,66 },
-            // BAC
-            new uint[] { 66,66,   100,10,  10,100 },
-            // BCA
-            new uint[] { 10,100,  100,10,  66,66 },
-            // CAB
-            new uint[] { 66,66,   10,100,  100,10 },
-            // CBA
-            new uint[] { 10,100,  66,66,   100,10 }
+			// MONO
+			new uint[] { 50,50, 50,50, 50,50 },
+			// ABC
+			new uint[] { 100,10,  66,66,   10,100 },
+			// ACB
+			new uint[] { 100,10,  10,100,  66,66 },
+			// BAC
+			new uint[] { 66,66,   100,10,  10,100 },
+			// BCA
+			new uint[] { 10,100,  100,10,  66,66 },
+			// CAB
+			new uint[] { 66,66,   10,100,  100,10 },
+			// CBA
+			new uint[] { 10,100,  66,66,   100,10 }
 		};
 
 		/// <summary>

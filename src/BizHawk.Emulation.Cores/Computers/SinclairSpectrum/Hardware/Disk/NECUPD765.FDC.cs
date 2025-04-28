@@ -2150,16 +2150,16 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 						ResBuffer[1] = ActiveDrive.CurrentTrackID;
 					}
 					/*
-                    else if (ActiveDrive.SeekStatus == SEEK_INTACKNOWLEDGED)
-                    {
-                        // DriveA interrupt has already been acknowledged
-                        ActiveDrive.SeekStatus = SEEK_IDLE;
+					else if (ActiveDrive.SeekStatus == SEEK_INTACKNOWLEDGED)
+					{
+						// DriveA interrupt has already been acknowledged
+						ActiveDrive.SeekStatus = SEEK_IDLE;
 
-                        ResLength = 1;
-                        Status0 = 192;
-                        ResBuffer[0] = Status0;
-                    }
-                    */
+						ResLength = 1;
+						Status0 = 192;
+						ResBuffer[0] = Status0;
+					}
+					*/
 					else if (ActiveDrive.SeekStatus == SEEK_IDLE)
 					{
 						// SIS with no interrupt
@@ -2554,14 +2554,14 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 				}
 
 				/*
-                if ((CMD_FLAG_MF && !ActiveCommand.MF)
-                    || (CMD_FLAG_MT && !ActiveCommand.MT)
-                    || (CMD_FLAG_SK && !ActiveCommand.SK))
-                {
-                    // command byte included spurious bit 5,6 or 7 flags
-                    CMDIndex = CommandList.Count - 1;
-                }
-                */
+				if ((CMD_FLAG_MF && !ActiveCommand.MF)
+					|| (CMD_FLAG_MT && !ActiveCommand.MT)
+					|| (CMD_FLAG_SK && !ActiveCommand.SK))
+				{
+					// command byte included spurious bit 5,6 or 7 flags
+					CMDIndex = CommandList.Count - 1;
+				}
+				*/
 			}
 
 			CommCounter = 0;
@@ -2572,13 +2572,13 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 			ActivePhase = Phase.Command;
 
 			/*
-            // check for invalid SIS
-            if (ActiveInterrupt == InterruptState.None && CMDIndex == CC_SENSE_INTSTATUS)
-            {
-                CMDIndex = CC_INVALID;
-                //ActiveCommand.CommandDelegate(InstructionState.StartResult);
-            }
-            */
+			// check for invalid SIS
+			if (ActiveInterrupt == InterruptState.None && CMDIndex == CC_SENSE_INTSTATUS)
+			{
+				CMDIndex = CC_INVALID;
+				//ActiveCommand.CommandDelegate(InstructionState.StartResult);
+			}
+			*/
 
 			// set reslength
 			ResLength = ActiveCommand.ResultByteCount;
