@@ -67,7 +67,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
         /// <summary>
         /// Low bit of the ROM selection (in normal paging mode)
         /// </summary>
-       public bool ROMlow = false;
+        public bool ROMlow = false;
 
         /// <summary>
         /// Signs that the +2a/+3 special paging mode is activated
