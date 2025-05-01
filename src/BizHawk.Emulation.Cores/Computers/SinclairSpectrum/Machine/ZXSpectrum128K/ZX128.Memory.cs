@@ -6,36 +6,36 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 	/// </summary>
 	public partial class ZX128 : SpectrumBase
 	{
-        /* 128k paging controlled by writes to port 0x7ffd
-         *
-         *
+		/* 128k paging controlled by writes to port 0x7ffd
+		 *
+		 *
 
-            #7FFD (32765) - decoded as A15=0, A1=0 and /IORQ=0. Bits 0..5 are latched. Bits 0..2 select RAM bank in secton D. Bit 3 selects RAM bank to dispay screen (0 - RAM5, 1 - RAM7). Bit 4 selects ROM bank (0 - ROM0, 1 - ROM1). Bit 5, when set locks future writing to #7FFD port until reset. Reading #7FFD port is the same as writing #FF into it.
-            #BFFD (49149) - write data byte into AY-3-8912 chip.
-            #FFFD (65533) - select AY-3-8912 addres (D4..D7 ignored) and reading data byte.
+			#7FFD (32765) - decoded as A15=0, A1=0 and /IORQ=0. Bits 0..5 are latched. Bits 0..2 select RAM bank in secton D. Bit 3 selects RAM bank to dispay screen (0 - RAM5, 1 - RAM7). Bit 4 selects ROM bank (0 - ROM0, 1 - ROM1). Bit 5, when set locks future writing to #7FFD port until reset. Reading #7FFD port is the same as writing #FF into it.
+			#BFFD (49149) - write data byte into AY-3-8912 chip.
+			#FFFD (65533) - select AY-3-8912 addres (D4..D7 ignored) and reading data byte.
 
-         *  0xffff +--------+--------+--------+--------+--------+--------+--------+--------+
-                   | Bank 0 | Bank 1 | Bank 2 | Bank 3 | Bank 4 | Bank 5 | Bank 6 | Bank 7 |
-                   |        |        |(also at|        |        |(also at|        |        |
-                   |        |        | 0x8000)|        |        | 0x4000)|        |        |
-                   |        |        |        |        |        | screen |        | screen |
-            0xc000 +--------+--------+--------+--------+--------+--------+--------+--------+
-                   | Bank 2 |        Any one of these pages may be switched in.
-                   |        |
-                   |        |
-                   |        |
-            0x8000 +--------+
-                   | Bank 5 |
-                   |        |
-                   |        |
-                   | screen |
-            0x4000 +--------+--------+
-                   | ROM 0  | ROM 1  | Either ROM may be switched in.
-                   |        |        |
-                   |        |        |
-                   |        |        |
-            0x0000 +--------+--------+
-        */
+		 *  0xffff +--------+--------+--------+--------+--------+--------+--------+--------+
+				   | Bank 0 | Bank 1 | Bank 2 | Bank 3 | Bank 4 | Bank 5 | Bank 6 | Bank 7 |
+				   |        |        |(also at|        |        |(also at|        |        |
+				   |        |        | 0x8000)|        |        | 0x4000)|        |        |
+				   |        |        |        |        |        | screen |        | screen |
+			0xc000 +--------+--------+--------+--------+--------+--------+--------+--------+
+				   | Bank 2 |        Any one of these pages may be switched in.
+				   |        |
+				   |        |
+				   |        |
+			0x8000 +--------+
+				   | Bank 5 |
+				   |        |
+				   |        |
+				   | screen |
+			0x4000 +--------+--------+
+				   | ROM 0  | ROM 1  | Either ROM may be switched in.
+				   |        |        |
+				   |        |        |
+				   |        |        |
+			0x0000 +--------+--------+
+		*/
 
 		/// <summary>
 		/// Simulates reading from the bus (no contention)

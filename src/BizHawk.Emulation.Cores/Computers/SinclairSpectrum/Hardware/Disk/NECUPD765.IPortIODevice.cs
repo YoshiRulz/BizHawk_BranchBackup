@@ -26,16 +26,16 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 		};
 
 
-        /*
-         * Status read
-         * Data write
-         * Data read
-         * CMD code
-         * CMD string
-         * MT flag
-         * MK flag
-         * SK flag
-         * */
+		/*
+		 * Status read
+		 * Data write
+		 * Data read
+		 * CMD code
+		 * CMD string
+		 * MT flag
+		 * MK flag
+		 * SK flag
+		 * */
 		private readonly string[] workingArr = new string[3];
 
 		private void BuildCSVLine()

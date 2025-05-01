@@ -92,24 +92,24 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 		public override void Read(byte[] data)
 		{
 			/*
-                The .TAP files contain blocks of tape-saved data. All blocks start with two bytes specifying how many bytes will follow (not counting the two length bytes). Then raw tape data follows, including the flag and checksum bytes. The checksum is the bitwise XOR of all bytes including the flag byte. For example, when you execute the line SAVE "ROM" CODE 0,2 this will result:
+				The .TAP files contain blocks of tape-saved data. All blocks start with two bytes specifying how many bytes will follow (not counting the two length bytes). Then raw tape data follows, including the flag and checksum bytes. The checksum is the bitwise XOR of all bytes including the flag byte. For example, when you execute the line SAVE "ROM" CODE 0,2 this will result:
 
-                |------ Spectrum-generated data -------|       |---------|
+				|------ Spectrum-generated data -------|       |---------|
 
-               13 00 00 03 52 4f 4d 7x20 02 00 00 00 00 80 f1 04 00 ff f3 af a3
+			   13 00 00 03 52 4f 4d 7x20 02 00 00 00 00 80 f1 04 00 ff f3 af a3
 
-               ^^^^^...... first block is 19 bytes (17 bytes+flag+checksum)
-                     ^^... flag byte (A reg, 00 for headers, ff for data blocks)
-                        ^^ first byte of header, indicating a code block
+			   ^^^^^...... first block is 19 bytes (17 bytes+flag+checksum)
+					 ^^... flag byte (A reg, 00 for headers, ff for data blocks)
+						^^ first byte of header, indicating a code block
 
-               file name ..^^^^^^^^^^^^^
-               header info ..............^^^^^^^^^^^^^^^^^
-               checksum of header .........................^^
-               length of second block ........................^^^^^
-               flag byte ............................................^^
-               first two bytes of rom .................................^^^^^
-               checksum (checkbittoggle would be a better name!).............^^
-            */
+			   file name ..^^^^^^^^^^^^^
+			   header info ..............^^^^^^^^^^^^^^^^^
+			   checksum of header .........................^^
+			   length of second block ........................^^^^^
+			   flag byte ............................................^^
+			   first two bytes of rom .................................^^^^^
+			   checksum (checkbittoggle would be a better name!).............^^
+			*/
 
 			// clear existing tape blocks
 			_datacorder.DataBlocks.Clear();
@@ -163,11 +163,11 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 
 				// process the type byte
 				/*  (The type is 0,1,2 or 3 for a Program, Number array, Character array or Code file.
-                    A SCREEN$ file is regarded as a Code file with start address 16384 and length 6912 decimal.
-                    If the file is a Program file, parameter 1 holds the autostart line number (or a number >=32768 if no LINE parameter was given)
-                    and parameter 2 holds the start of the variable area relative to the start of the program. If it's a Code file, parameter 1 holds
-                    the start of the code block when saved, and parameter 2 holds 32768. For data files finally, the byte at position 14 decimal holds the variable name.)
-                */
+					A SCREEN$ file is regarded as a Code file with start address 16384 and length 6912 decimal.
+					If the file is a Program file, parameter 1 holds the autostart line number (or a number >=32768 if no LINE parameter was given)
+					and parameter 2 holds the start of the variable area relative to the start of the program. If it's a Code file, parameter 1 holds
+					the start of the code block when saved, and parameter 2 holds 32768. For data files finally, the byte at position 14 decimal holds the variable name.)
+				*/
 
 				tdb.MetaData = new Dictionary<BlockDescriptorTitle, string>();
 

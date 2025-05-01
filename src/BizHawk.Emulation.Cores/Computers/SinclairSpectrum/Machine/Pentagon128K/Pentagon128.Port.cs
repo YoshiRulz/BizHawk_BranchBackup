@@ -142,12 +142,12 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 				// store the last OUT byte
 				LastULAOutByte = value;
 
-                /*
-                    Bit   7   6   5   4   3   2   1   0
-                        +-------------------------------+
-                        |   |   |   | E | M |   Border  |
-                        +-------------------------------+
-                */
+				/*
+					Bit   7   6   5   4   3   2   1   0
+						+-------------------------------+
+						|   |   |   | E | M |   Border  |
+						+-------------------------------+
+				*/
 
 				// Border - LSB 3 bits hold the border colour
 				if (ULADevice.BorderColor != (value & BORDER_BIT))

@@ -353,36 +353,36 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 		/// The register array
 		/// </summary>
 		/*
-            The AY-3-8910/8912 contains 16 internal registers as follows:
+			The AY-3-8910/8912 contains 16 internal registers as follows:
 
-            Register    Function	                Range
-            0	        Channel A fine pitch	    8-bit (0-255)
-            1	        Channel A course pitch	    4-bit (0-15)
-            2	        Channel B fine pitch	    8-bit (0-255)
-            3	        Channel B course pitch	    4-bit (0-15)
-            4	        Channel C fine pitch	    8-bit (0-255)
-            5	        Channel C course pitch	    4-bit (0-15)
-            6	        Noise pitch	                5-bit (0-31)
-            7	        Mixer	                    8-bit (see below)
-            8	        Channel A volume	        4-bit (0-15, see below)
-            9	        Channel B volume	        4-bit (0-15, see below)
-            10	        Channel C volume	        4-bit (0-15, see below)
-            11	        Envelope fine duration	    8-bit (0-255)
-            12	        Envelope course duration	8-bit (0-255)
-            13	        Envelope shape	            4-bit (0-15)
-            14	        I/O port A	                8-bit (0-255)
-            15	        I/O port B	                8-bit (0-255) (Not present on the AY-3-8912)
+			Register    Function	                Range
+			0	        Channel A fine pitch	    8-bit (0-255)
+			1	        Channel A course pitch	    4-bit (0-15)
+			2	        Channel B fine pitch	    8-bit (0-255)
+			3	        Channel B course pitch	    4-bit (0-15)
+			4	        Channel C fine pitch	    8-bit (0-255)
+			5	        Channel C course pitch	    4-bit (0-15)
+			6	        Noise pitch	                5-bit (0-31)
+			7	        Mixer	                    8-bit (see below)
+			8	        Channel A volume	        4-bit (0-15, see below)
+			9	        Channel B volume	        4-bit (0-15, see below)
+			10	        Channel C volume	        4-bit (0-15, see below)
+			11	        Envelope fine duration	    8-bit (0-255)
+			12	        Envelope course duration	8-bit (0-255)
+			13	        Envelope shape	            4-bit (0-15)
+			14	        I/O port A	                8-bit (0-255)
+			15	        I/O port B	                8-bit (0-255) (Not present on the AY-3-8912)
 
-            * The volume registers (8, 9 and 10) contain a 4-bit setting but if bit 5 is set then that channel uses the
-                envelope defined by register 13 and ignores its volume setting.
-            * The mixer (register 7) is made up of the following bits (low=enabled):
+			* The volume registers (8, 9 and 10) contain a 4-bit setting but if bit 5 is set then that channel uses the
+				envelope defined by register 13 and ignores its volume setting.
+			* The mixer (register 7) is made up of the following bits (low=enabled):
 
-            Bit:        7	    6	    5	    4	    3	    2	    1	    0
-            Register:   I/O	    I/O	    Noise	Noise	Noise	Tone	Tone	Tone
-            Channel:    B       A	    C	    B	    A	    C	    B	    A
+			Bit:        7	    6	    5	    4	    3	    2	    1	    0
+			Register:   I/O	    I/O	    Noise	Noise	Noise	Tone	Tone	Tone
+			Channel:    B       A	    C	    B	    A	    C	    B	    A
 
-            The AY-3-8912 ignores bit 7 of this register.
-        */
+			The AY-3-8912 ignores bit 7 of this register.
+		*/
 		private int[] _registers = new int[16];
 
 		/// <summary>

@@ -5,30 +5,30 @@
 	/// </summary>
 	public partial class ZX48 : SpectrumBase
 	{
-        /* 48K Spectrum has NO memory paging
-         *
-         *  0xffff +--------+
-                   | Bank 2 |
-                   |        |
-                   |        |
-                   |        |
-            0xc000 +--------+
-                   | Bank 1 |
-                   |        |
-                   |        |
-                   |        |
-            0x8000 +--------+
-                   | Bank 0 |
-                   |        |
-                   |        |
-                   | screen |
-            0x4000 +--------+
-                   | ROM 0  |
-                   |        |
-                   |        |
-                   |        |
-            0x0000 +--------+
-        */
+		/* 48K Spectrum has NO memory paging
+		 *
+		 *  0xffff +--------+
+				   | Bank 2 |
+				   |        |
+				   |        |
+				   |        |
+			0xc000 +--------+
+				   | Bank 1 |
+				   |        |
+				   |        |
+				   |        |
+			0x8000 +--------+
+				   | Bank 0 |
+				   |        |
+				   |        |
+				   | screen |
+			0x4000 +--------+
+				   | ROM 0  |
+				   |        |
+				   |        |
+				   |        |
+			0x0000 +--------+
+		*/
 
 		/// <summary>
 		/// Simulates reading from the bus (no contention)

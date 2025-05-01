@@ -7,51 +7,51 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 	/// </summary>
 	public partial class ZX128Plus3 : SpectrumBase
 	{
-        /*  http://www.worldofspectrum.org/faq/reference/128kreference.htm
-         *
-         *  Port 0x7ffd behaves in the almost exactly the same way as on the 128K/+2, with two exceptions:
+		/*  http://www.worldofspectrum.org/faq/reference/128kreference.htm
+		 *
+		 *  Port 0x7ffd behaves in the almost exactly the same way as on the 128K/+2, with two exceptions:
 
-            Bit 4 is now the low bit of the ROM selection.
-            The partial decoding used is now slightly different: the hardware will respond only to those port addresses with bit 1 reset, bit 14 set and bit 15 reset (as opposed to just bits 1 and 15 reset on the 128K/+2).
-            The extra paging features of the +2A/+3 are controlled by port 0x1ffd (again, partial decoding applies here: the hardware will respond to all port addresses with bit 1 reset, bit 12 set and bits 13, 14 and 15 reset). This port is also write-only, and its last value should be saved at 0x5b67 (23399).
+			Bit 4 is now the low bit of the ROM selection.
+			The partial decoding used is now slightly different: the hardware will respond only to those port addresses with bit 1 reset, bit 14 set and bit 15 reset (as opposed to just bits 1 and 15 reset on the 128K/+2).
+			The extra paging features of the +2A/+3 are controlled by port 0x1ffd (again, partial decoding applies here: the hardware will respond to all port addresses with bit 1 reset, bit 12 set and bits 13, 14 and 15 reset). This port is also write-only, and its last value should be saved at 0x5b67 (23399).
 
-            Port 0x1ffd responds as follows:
+			Port 0x1ffd responds as follows:
 
-              Bit 0: Paging mode. 0=normal, 1=special
-              Bit 1: In normal mode, ignored.
-              Bit 2: In normal mode, high bit of ROM selection. The four ROMs are:
-                      ROM 0: 128k editor, menu system and self-test program
-                      ROM 1: 128k syntax checker
-                      ROM 2: +3DOS
-                      ROM 3: 48 BASIC
-              Bit 3: Disk motor; 1=on, 0=off
-              Bit 4: Printer port strobe.
-            When special mode is selected, the memory map changes to one of four configurations specified in bits 1 and 2 of port 0x1ffd:
-                     Bit 2 =0    Bit 2 =0    Bit 2 =1    Bit 2 =1
-                     Bit 1 =0    Bit 1 =1    Bit 1 =0    Bit 1 =1
-             0xffff +--------+  +--------+  +--------+  +--------+
-                    | Bank 3 |  | Bank 7 |  | Bank 3 |  | Bank 3 |
-                    |        |  |        |  |        |  |        |
-                    |        |  |        |  |        |  |        |
-                    |        |  | screen |  |        |  |        |
-             0xc000 +--------+  +--------+  +--------+  +--------+
-                    | Bank 2 |  | Bank 6 |  | Bank 6 |  | Bank 6 |
-                    |        |  |        |  |        |  |        |
-                    |        |  |        |  |        |  |        |
-                    |        |  |        |  |        |  |        |
-             0x8000 +--------+  +--------+  +--------+  +--------+
-                    | Bank 1 |  | Bank 5 |  | Bank 5 |  | Bank 7 |
-                    |        |  |        |  |        |  |        |
-                    |        |  |        |  |        |  |        |
-                    |        |  | screen |  | screen |  | screen |
-             0x4000 +--------+  +--------+  +--------+  +--------+
-                    | Bank 0 |  | Bank 4 |  | Bank 4 |  | Bank 4 |
-                    |        |  |        |  |        |  |        |
-                    |        |  |        |  |        |  |        |
-                    |        |  |        |  |        |  |        |
-             0x0000 +--------+  +--------+  +--------+  +--------+
-            RAM banks 1,3,4 and 6 are used for the disc cache and RAMdisc, while Bank 7 contains editor scratchpads and +3DOS workspace.
-        */
+			  Bit 0: Paging mode. 0=normal, 1=special
+			  Bit 1: In normal mode, ignored.
+			  Bit 2: In normal mode, high bit of ROM selection. The four ROMs are:
+					  ROM 0: 128k editor, menu system and self-test program
+					  ROM 1: 128k syntax checker
+					  ROM 2: +3DOS
+					  ROM 3: 48 BASIC
+			  Bit 3: Disk motor; 1=on, 0=off
+			  Bit 4: Printer port strobe.
+			When special mode is selected, the memory map changes to one of four configurations specified in bits 1 and 2 of port 0x1ffd:
+					 Bit 2 =0    Bit 2 =0    Bit 2 =1    Bit 2 =1
+					 Bit 1 =0    Bit 1 =1    Bit 1 =0    Bit 1 =1
+			 0xffff +--------+  +--------+  +--------+  +--------+
+					| Bank 3 |  | Bank 7 |  | Bank 3 |  | Bank 3 |
+					|        |  |        |  |        |  |        |
+					|        |  |        |  |        |  |        |
+					|        |  | screen |  |        |  |        |
+			 0xc000 +--------+  +--------+  +--------+  +--------+
+					| Bank 2 |  | Bank 6 |  | Bank 6 |  | Bank 6 |
+					|        |  |        |  |        |  |        |
+					|        |  |        |  |        |  |        |
+					|        |  |        |  |        |  |        |
+			 0x8000 +--------+  +--------+  +--------+  +--------+
+					| Bank 1 |  | Bank 5 |  | Bank 5 |  | Bank 7 |
+					|        |  |        |  |        |  |        |
+					|        |  |        |  |        |  |        |
+					|        |  | screen |  | screen |  | screen |
+			 0x4000 +--------+  +--------+  +--------+  +--------+
+					| Bank 0 |  | Bank 4 |  | Bank 4 |  | Bank 4 |
+					|        |  |        |  |        |  |        |
+					|        |  |        |  |        |  |        |
+					|        |  |        |  |        |  |        |
+			 0x0000 +--------+  +--------+  +--------+  +--------+
+			RAM banks 1,3,4 and 6 are used for the disc cache and RAMdisc, while Bank 7 contains editor scratchpads and +3DOS workspace.
+		*/
 
 		/// <summary>
 		/// Simulates reading from the bus (no contention)
@@ -612,11 +612,11 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 		{
 			RomData = romData;
 			// +3 uses ROM0, ROM1, ROM2 & ROM3
-            /*  ROM 0: 128k editor, menu system and self-test program
-                ROM 1: 128k syntax checker
-                ROM 2: +3DOS
-                ROM 3: 48 BASIC
-            */
+			/*  ROM 0: 128k editor, menu system and self-test program
+				ROM 1: 128k syntax checker
+				ROM 2: +3DOS
+				ROM 3: 48 BASIC
+			*/
 			Stream stream = new MemoryStream(RomData.RomBytes);
 			stream.Read(ROM0, 0, 16384);
 			stream.Read(ROM1, 0, 16384);
