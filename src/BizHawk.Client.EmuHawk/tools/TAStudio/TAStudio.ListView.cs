@@ -383,7 +383,6 @@ namespace BizHawk.Client.EmuHawk
 				}
 				else if (columnName != CursorColumnName)
 				{
-					var frame = TasView.AnyRowsSelected ? TasView.FirstSelectedRowIndex : 0;
 					var buttonName = TasView.CurrentCell.Column!.Name;
 
 					if (ControllerType.BoolButtons.Contains(buttonName))
@@ -391,8 +390,9 @@ namespace BizHawk.Client.EmuHawk
 						if (ModifierKeys != Keys.Alt)
 						{
 							// nifty taseditor logic
+							var selection = TasView.SelectedRows.ToArray(); // sorted asc, length >= 1
 							bool allPressed = true;
-							foreach (var index in TasView.SelectedRows)
+							foreach (var index in selection)
 							{
 								if (index == CurrentTasMovie.FrameCount // last movie frame can't have input, but can be selected
 									|| !CurrentTasMovie.BoolIsPressed(index, buttonName))
@@ -401,7 +401,7 @@ namespace BizHawk.Client.EmuHawk
 									break;
 								}
 							}
-							CurrentTasMovie.SetBoolStates(frame, TasView.SelectedRows.Count(), buttonName, !allPressed);
+							CurrentTasMovie.SetBoolStates(frame: selection[0], count: selection.Length, buttonName, val: !allPressed);
 						}
 						else
 						{
