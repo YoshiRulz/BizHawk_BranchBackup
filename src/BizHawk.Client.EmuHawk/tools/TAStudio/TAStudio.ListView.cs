@@ -390,18 +390,69 @@ namespace BizHawk.Client.EmuHawk
 						if (ModifierKeys != Keys.Alt)
 						{
 							// nifty taseditor logic
+							// your TAS Editor logic failed us (it didn't account for non-contiguous `SelectedRows`) --yoshi
 							var selection = TasView.SelectedRows.ToArray(); // sorted asc, length >= 1
 							bool allPressed = true;
-							foreach (var index in selection)
+							var contiguous = true;
+							var iSelection = 0;
+							var lastFrameIndexSeen = selection[iSelection] - 1;
+							while (iSelection < selection.Length)
 							{
+								var index = selection[iSelection];
+								if (index - lastFrameIndexSeen is not 1)
+								{
+									contiguous = false;
+									break;
+								}
+								lastFrameIndexSeen = index;
 								if (index == CurrentTasMovie.FrameCount // last movie frame can't have input, but can be selected
 									|| !CurrentTasMovie.BoolIsPressed(index, buttonName))
 								{
 									allPressed = false;
 									break;
 								}
+								iSelection++;
 							}
-							CurrentTasMovie.SetBoolStates(frame: selection[0], count: selection.Length, buttonName, val: !allPressed);
+							if (!allPressed)
+							{
+								// still need to check for discontinuity
+								while (iSelection < selection.Length)
+								{
+									var index = selection[iSelection];
+									if (index - lastFrameIndexSeen is not 1)
+									{
+										contiguous = false;
+										break;
+									}
+									lastFrameIndexSeen = index;
+									iSelection++;
+								}
+							}
+							else if (!contiguous)
+							{
+								// still need to check for `false` values
+								allPressed = allPressed && selection.Skip(iSelection - 1) // break'd before checking the next one, so less 1 (and can't get here if `iSelection` is 0 so that's safe)
+									.All(index => index < CurrentTasMovie.FrameCount // last movie frame can't have input, but can be selected
+										&& CurrentTasMovie.BoolIsPressed(index, buttonName));
+							}
+							// else all contiguous and all `true`
+
+							CurrentTasMovie.SetBoolStates(frame: selection[0], count: iSelection, buttonName, val: !allPressed);
+							var blockStart = iSelection;
+							lastFrameIndexSeen = selection[iSelection] - 1;
+							while (iSelection < selection.Length)
+							{
+								var index = selection[iSelection];
+								if (index - lastFrameIndexSeen is not 1)
+								{
+									// discontinuity; split off another block, and this is now the start of the next block
+									CurrentTasMovie.SetBoolStates(frame: selection[blockStart], count: iSelection - blockStart, buttonName, val: !allPressed);
+									blockStart = iSelection;
+								}
+								lastFrameIndexSeen = index;
+								iSelection++;
+							}
+							CurrentTasMovie.SetBoolStates(frame: selection[blockStart], count: iSelection - blockStart, buttonName, val: !allPressed);
 						}
 						else
 						{
