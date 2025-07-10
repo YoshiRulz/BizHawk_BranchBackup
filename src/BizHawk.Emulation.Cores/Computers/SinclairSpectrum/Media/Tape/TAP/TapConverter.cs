@@ -158,12 +158,12 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 				}
 
 				// process the type byte
-				/*  (The type is 0,1,2 or 3 for a Program, Number array, Character array or Code file.
-					A SCREEN$ file is regarded as a Code file with start address 16384 and length 6912 decimal.
-					If the file is a Program file, parameter 1 holds the autostart line number (or a number >=32768 if no LINE parameter was given)
-					and parameter 2 holds the start of the variable area relative to the start of the program. If it's a Code file, parameter 1 holds
-					the start of the code block when saved, and parameter 2 holds 32768. For data files finally, the byte at position 14 decimal holds the variable name.)
-				*/
+				/* (The type is 0,1,2 or 3 for a Program, Number array, Character array or Code file.
+				 * A SCREEN$ file is regarded as a Code file with start address 16384 and length 6912 decimal.
+				 * If the file is a Program file, parameter 1 holds the autostart line number (or a number >=32768 if no LINE parameter was given)
+				 * and parameter 2 holds the start of the variable area relative to the start of the program. If it's a Code file, parameter 1 holds
+				 * the start of the code block when saved, and parameter 2 holds 32768. For data files finally, the byte at position 14 decimal holds the variable name.)
+				 */
 
 				tdb.MetaData = new Dictionary<BlockDescriptorTitle, string>();
 

@@ -6,12 +6,10 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 	/// <summary>
 	/// Floppy drive related stuff
 	/// </summary>
-	/*
-        Implementation based on the information contained here:
-        http://www.cpcwiki.eu/index.php/765_FDC
-        and here:
-        http://www.cpcwiki.eu/imgs/f/f3/UPD765_Datasheet_OCRed.pdf
-    */
+	/// <remarks>
+	/// Implementation based on the information contained <see href="http://www.cpcwiki.eu/index.php/765_FDC">here</see>
+	/// and <see href="http://www.cpcwiki.eu/imgs/f/f3/UPD765_Datasheet_OCRed.pdf">here</see>
+	/// </remarks>
 	public partial class NECUPD765 : IFDDHost
 	{
 		/// <summary>
