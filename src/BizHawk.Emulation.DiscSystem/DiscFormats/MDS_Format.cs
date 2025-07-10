@@ -250,10 +250,10 @@ namespace BizHawk.Emulation.DiscSystem
 			/// </summary>
 			public int Session;
 
-//          /// <summary>
-//          /// this seems just to be the LBA corresponding to AMIN:ASEC:AFRAME (give or take 150). It's not stored on the disc, and it's redundant.
-//          /// </summary>
-//          public int ALBA;
+#if false
+			/// <summary>This seems just to be the LBA corresponding to AMIN:ASEC:AFRAME (give or take 150). It's not stored on the disc, and it's redundant.</summary>
+			public int ALBA;
+#endif
 
 			/// <summary>
 			/// this seems just to be the LBA corresponding to PMIN:PSEC:PFRAME (give or take 150).

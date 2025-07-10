@@ -219,7 +219,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 					//description += (crc != 0) ? $", crc bad (#{crcFile:X2}!=#{crcValue:X2})" : ", crc ok";
 					tdb.AddMetaData(BlockDescriptorTitle.Undefined, description);
 				}
-				/*
+#if false
 				if (blockdata[0] == 0x00 && blockSize == 19 && (blockdata[1] == 0x00) || blockdata[1] == 3)
 				{
 					// This is the PROGRAM header
@@ -260,7 +260,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 					description = $"#{blockdata[0]:X2} block, {blockSize - 2} bytes";
 					description += (crc != 0) ? $", crc bad (#{crcFile:X2}!=#{crcValue:X2})" : ", crc ok";
 				}
-				*/
+#endif
 
 				tdb.BlockDescription = BlockType.Standard_Speed_Data_Block;
 
@@ -391,8 +391,8 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 				// add the raw data
 				tdb.BlockData = blockdata;
 
+#if false
 				// generate separate PAUS block
-				/*
 				TapeDataBlock tdbPause = new TapeDataBlock();
 				tdbPause.DataPeriods = new List<int>();
 				tdbPause.BlockDescription = BlockType.PAUSE_BLOCK;
@@ -402,12 +402,12 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 				//tdbPause.DataPeriods.Add(pauseInTStates);
 				tdb.PauseInMS = 0;
 				tdb.PauseInTStates = pauseInTStates;
-				*/
+#endif
 
 				// add block to the tape
 				_datacorder.DataBlocks.Add(tdb);
 
-				/*
+#if false
 				// PAUS block if neccessary
 				if (pauseInTStates > 0)
 				{
@@ -429,7 +429,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 
 					_datacorder.DataBlocks.Add(tdbPause);
 				}
-				*/
+#endif
 			}
 		}
 	}

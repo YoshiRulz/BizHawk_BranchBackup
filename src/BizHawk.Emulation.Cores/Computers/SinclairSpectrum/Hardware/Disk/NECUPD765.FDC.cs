@@ -2149,7 +2149,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 						// second byte is the current track id
 						ResBuffer[1] = ActiveDrive.CurrentTrackID;
 					}
-					/*
+#if false
 					else if (ActiveDrive.SeekStatus == SEEK_INTACKNOWLEDGED)
 					{
 						// DriveA interrupt has already been acknowledged
@@ -2159,7 +2159,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 						Status0 = 192;
 						ResBuffer[0] = Status0;
 					}
-					*/
+#endif
 					else if (ActiveDrive.SeekStatus == SEEK_IDLE)
 					{
 						// SIS with no interrupt
@@ -2553,7 +2553,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 					CMDIndex = CommandList.Count - 1;
 				}
 
-				/*
+#if false
 				if ((CMD_FLAG_MF && !ActiveCommand.MF)
 					|| (CMD_FLAG_MT && !ActiveCommand.MT)
 					|| (CMD_FLAG_SK && !ActiveCommand.SK))
@@ -2561,7 +2561,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 					// command byte included spurious bit 5,6 or 7 flags
 					CMDIndex = CommandList.Count - 1;
 				}
-				*/
+#endif
 			}
 
 			CommCounter = 0;
@@ -2571,14 +2571,14 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 			// move to command phase
 			ActivePhase = Phase.Command;
 
-			/*
+#if false
 			// check for invalid SIS
 			if (ActiveInterrupt == InterruptState.None && CMDIndex == CC_SENSE_INTSTATUS)
 			{
 				CMDIndex = CC_INVALID;
 				//ActiveCommand.CommandDelegate(InstructionState.StartResult);
 			}
-			*/
+#endif
 
 			// set reslength
 			ResLength = ActiveCommand.ResultByteCount;

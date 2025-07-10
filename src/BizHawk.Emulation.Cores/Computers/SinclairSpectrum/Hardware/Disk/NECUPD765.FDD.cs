@@ -290,7 +290,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 			/// </summary>
 			public bool FLAG_TRACK0 => TrackIndex == 0;
 
-			/*
+#if false
 			/// <summary>
 			/// Moves the head across the disk cylinders
 			/// </summary>
@@ -328,9 +328,6 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 				// move the head
 				CurrentTrack = (byte)trk;
 			}
-			*/
-
-			/*
 
 			/// <summary>
 			/// Finds a supplied sector
@@ -483,9 +480,6 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 					return;
 				}
 			}
-			*/
-
-			/*
 
 			/// <summary>
 			/// The drive performs a seek operation if necessary
@@ -698,7 +692,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 
 				// set seek end
 				SetBit(SR0_SE, ref IntStatus);
-				/*
+#if false
 				// head address
 				if (CurrentSide > 0)
 				{
@@ -708,8 +702,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 					// set the EC bit
 					SetBit(SR0_EC, ref IntStatus);
 				}
-				*/
-			/*
+#endif
 			// UnitSelect
 			SetUnitSelect(ID, ref IntStatus);
 
@@ -725,7 +718,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 			//CurrentState = DriveMainState.None;
 
 		}
-	*/
+#endif
 
 			public DriveState(int driveID, NECUPD765 fdc)
 			{

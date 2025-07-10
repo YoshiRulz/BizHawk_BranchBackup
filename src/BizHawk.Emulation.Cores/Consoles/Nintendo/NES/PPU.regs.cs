@@ -104,35 +104,39 @@ namespace BizHawk.Emulation.Cores.Nintendo.NES
 			//but just to be safe, we're gonna save it
 			public PPUSTATUS status = new PPUSTATUS();
 
-			//public int ComputeIndex()
-			//{
-			//    return fv | (v << 3) | (h << 4) | (vt << 5) | (ht << 10) | (fh << 15);
-			//}
-			//public void DecodeIndex(int index)
-			//{
-			//    fv = index & 7;
-			//    v = (index >> 3) & 1;
-			//    h = (index >> 4) & 1;
-			//    vt = (index >> 5) & 0x1F;
-			//    ht = (index >> 10) & 0x1F;
-			//    fh = (index >> 15) & 7;
-			//}
+#if false
+			public int ComputeIndex()
+				=> fv | (v << 3) | (h << 4) | (vt << 5) | (ht << 10) | (fh << 15);
 
-			//const int tbl_size = 1 << 18;
-			//int[] tbl_increment_hsc = new int[tbl_size];
-			//int[] tbl_increment_vs = new int[tbl_size];
-			//public void BuildTables()
-			//{
-			//    for (int i = 0; i < tbl_size; i++)
-			//    {
-			//        DecodeIndex(i);
-			//        increment_hsc();
-			//        tbl_increment_hsc[i] = ComputeIndex();
-			//        DecodeIndex(i);
-			//        increment_vs();
-			//        tbl_increment_vs[i] = ComputeIndex();
-			//    }
-			//}
+			public void DecodeIndex(int index)
+			{
+				fv = index & 7;
+				v = (index >> 3) & 1;
+				h = (index >> 4) & 1;
+				vt = (index >> 5) & 0x1F;
+				ht = (index >> 10) & 0x1F;
+				fh = (index >> 15) & 7;
+			}
+
+			const int tbl_size = 1 << 18;
+
+			int[] tbl_increment_hsc = new int[tbl_size];
+
+			int[] tbl_increment_vs = new int[tbl_size];
+
+			public void BuildTables()
+			{
+				for (int i = 0; i < tbl_size; i++)
+				{
+					DecodeIndex(i);
+					increment_hsc();
+					tbl_increment_hsc[i] = ComputeIndex();
+					DecodeIndex(i);
+					increment_vs();
+					tbl_increment_vs[i] = ComputeIndex();
+				}
+			}
+#endif
 
 			public void reset()
 			{

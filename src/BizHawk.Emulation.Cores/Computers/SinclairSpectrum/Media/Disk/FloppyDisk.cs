@@ -399,7 +399,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 			return false;
 		}
 
-		/*
+#if false
 		/// <summary>
 		/// Should be run at the end of the ParseDisk process
 		/// If speedlock is detected the flag is set in the disk image
@@ -496,7 +496,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 			sec.ActualDataByteLength = data.Count;
 
 		}
-		*/
+#endif
 
 		/// <summary>
 		/// Returns the track count for the disk
@@ -660,25 +660,21 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 						// weak read neccessary
 						int copies = ActualDataByteLength / (0x80 << SectorSize);
 
+#if true
 						// handle index wrap-around
 						if (WeakReadIndex > copies - 1)
 							WeakReadIndex = copies - 1;
 
 						// get the sector data based on the current weakreadindex
 						int step = WeakReadIndex * (0x80 << SectorSize);
-						byte[] res = new byte[(0x80 << SectorSize)];
-						Array.Copy(SectorData, step, res, 0, 0x80 << SectorSize);
-						return res;
-
-						/*
-						int copies = ActualDataByteLength / (0x80 << SectorSize);
+#else
 						Random rnd = new Random();
 						int r = rnd.Next(0, copies - 1);
 						int step = r * (0x80 << SectorSize);
+#endif
 						byte[] res = new byte[(0x80 << SectorSize)];
 						Array.Copy(SectorData, step, res, 0, 0x80 << SectorSize);
 						return res;
-						*/
 					}
 				}
 			}

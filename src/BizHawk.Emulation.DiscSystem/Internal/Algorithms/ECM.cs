@@ -37,19 +37,21 @@ namespace BizHawk.Emulation.DiscSystem
 		{
 			//14.3 of yellowbook specifies EDC crc as P(x) = (x^16 + x^15 + x^2 + 1) . (x^16 + x^2 + x + 1)
 			//confirmation at http://cdmagediscussion.yuku.com/topic/742/EDC-calculation
-			//int Pa = 0x18005;
-			//int Pb = 0x10007;
-			//long Px = 0;
-			//for (int i = 0; i <= 16; i++)
-			//  for (int j = 0; j <= 16; j++)
-			//  {
-			//    //multiply Pa[i] * Pb[j]
-			//    int bit = (Pa >> i) & (Pb >> j) & 1;
-			//    //xor into result, achieving modulo-2 thereby
-			//    Px ^= (long)bit << (i + j);
-			//  }
-			//uint edc_poly = (uint)Px;
+#if true
 			const uint edc_poly = 0x8001801B;
+#else
+			const int Pa = 0x18005;
+			const int Pb = 0x10007;
+			long Px = 0;
+			for (int i = 0; i <= 16; i++) for (int j = 0; j <= 16; j++)
+			{
+				// multiply Pa[i] * Pb[j]
+				int bit = (Pa >> i) & (Pb >> j) & 1;
+				// xor into result, achieving modulo-2 thereby
+				Px ^= (long) bit << (i + j);
+			}
+			uint edc_poly = (uint) Px;
+#endif
 
 			//generate the CRC table
 			var reverse_edc_poly = BitReverse.Reverse32(edc_poly);
@@ -80,15 +82,13 @@ namespace BizHawk.Emulation.DiscSystem
 				if (n > 0xFF) b ^= 0x1D; //primitive polynomial x^8 + x^4 + x^3 + x^2 + 1 -> 0x11D
 				mul2tab[i] = (byte)b;
 			}
-
-			//(here is a more straightforward way of doing it, just to check)
-			//byte[] mul2tab_B = new byte[256];
-			//for (int i = 1; i < 256; i++)
-			//  mul2tab_B[i] = FFUtil.gf_mul((byte)i, (byte)2);
-
-			////(make sure theyre the same)
-			//for (int i = 0; i < 256; i++)
-			//  System.Diagnostics.Debug.Assert(mul2tab[i] == mul2tab_B[i]);
+#if false
+			// (here is a more straightforward way of doing it, just to check)
+			byte[] mul2tab_B = new byte[256];
+			for (int i = 1; i < 256; i++) mul2tab_B[i] = FFUtil.gf_mul((byte) i, (byte) 2);
+			// (make sure they're the same)
+			for (int i = 0; i < 256; i++) System.Diagnostics.Debug.Assert(mul2tab[i] == mul2tab_B[i]);
+#endif
 
 			//create a table implementing f(i) = i/3
 			for (var i = 0; i < 256; i++)
@@ -100,15 +100,13 @@ namespace BizHawk.Emulation.DiscSystem
 				//this idea was taken from Corlett's techniques; I know not from whence they came.
 				div3tab[x3] = x1;
 			}
-
-			//(here is a more straightforward way of doing it, just to check)
-			//byte[] div3tab_B = new byte[256];
-			//for (int i = 0; i < 256; i++)
-			//  div3tab_B[i] = FFUtil.gf_div((byte)i, 3);
-
-			////(make sure theyre the same)
-			//for (int i = 0; i < 256; i++)
-			//  System.Diagnostics.Debug.Assert(div3tab[i] == div3tab_B[i]);
+#if false
+			// (here is a more straightforward way of doing it, just to check)
+			byte[] div3tab_B = new byte[256];
+			for (int i = 0; i < 256; i++) div3tab_B[i] = FFUtil.gf_div((byte) i, 3);
+			// (make sure they're the same)
+			for (int i = 0; i < 256; i++) System.Diagnostics.Debug.Assert(div3tab[i] == div3tab_B[i]);
+#endif
 		}
 
 		/// <summary>

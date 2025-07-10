@@ -74,7 +74,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 		}
 
 
-		/*
+#if false
 		public readonly string[] _bitPos = new string[]
 		{
 			"P1 Right",
@@ -83,6 +83,6 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 			"P1 Up",
 			"P1 Button"
 		};
-		*/
+#endif
 	}
 }

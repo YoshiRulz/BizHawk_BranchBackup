@@ -177,7 +177,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 					_registers[i] = 0;
 			}
 
-			/*
+#if false
 			_noiseVal = 0x0FFFF;
 			_outABC = 0;
 			_outNoiseABC = 0;
@@ -201,7 +201,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 
 			// update the audio buffer
 			BufferUpdate(fr);
-			*/
+#endif
 		}
 
 		/// <summary>

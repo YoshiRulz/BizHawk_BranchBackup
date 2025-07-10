@@ -178,7 +178,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 							}
 							break;
 					}
-					/*
+#if false
 					// ZXSTPLUS3
 					if (s._machine.Spectrum.MachineType == MachineType.ZXSpectrum128Plus3)
 					{
@@ -219,7 +219,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 						char[] terminator = "\0".ToCharArray();
 						r.Write(terminator);
 					}
-					*/
+#endif
 
 				}
 

@@ -9,25 +9,27 @@ namespace BizHawk.Emulation.Cores.Components.M6502
 	public partial class MOS6502X<TLink>
 	{
 		//don't know whether this system is any faster. hard to get benchmarks someone else try it?
-		//static ShortBuffer CompiledMicrocode;
-		//static ShortBuffer MicrocodeIndex;
+#if false
+		static ShortBuffer CompiledMicrocode;
+
+		static ShortBuffer MicrocodeIndex;
+
 		static MOS6502X()
 		{
-			//  int index = 0;
-			//  MicrocodeIndex = new ShortBuffer(VOP_NUM);
-			//  List<Uop> temp = new List<Uop>();
-			//  for (int i = 0; i < VOP_NUM; i++)
-			//  {
-			//    MicrocodeIndex[i] = (short)index;
-			//    int numUops = Microcode[i].Length;
-			//    for (int j = 0; j < numUops; j++)
-			//      temp.Add(Microcode[i][j]);
-			//    index += numUops;
-			//  }
-			//  CompiledMicrocode = new ShortBuffer(temp.Count);
-			//  for (int i = 0; i < temp.Count; i++)
-			//    CompiledMicrocode[i] = (short)temp[i];
+			int index = 0;
+			MicrocodeIndex = new(VOP_NUM);
+			List<Uop> temp = new();
+			for (int i = 0; i < VOP_NUM; i++)
+			{
+				MicrocodeIndex[i] = (short) index;
+				int numUops = Microcode[i].Length;
+				for (int j = 0; j < numUops; j++) temp.Add(Microcode[i][j]);
+				index += numUops;
+			}
+			CompiledMicrocode = new(temp.Count);
+			for (int i = 0; i < temp.Count; i++) CompiledMicrocode[i] = (short) temp[i];
 		}
+#endif
 
 		private static readonly Uop[][] Microcode =
 		{
@@ -481,30 +483,32 @@ namespace BizHawk.Emulation.Cores.Components.M6502
 		private void InitOpcodeHandlers()
 		{
 			//delegates arent faster than the switch. pretty sure. don't use it.
-			//opcodeHandlers = new Action[] {
-			//  Unsupported,Fetch1, Fetch1_Real, Fetch2, Fetch3,FetchDummy,
-			//  NOP,JSR,IncPC,
-			//  Abs_WRITE_STA, Abs_WRITE_STX, Abs_WRITE_STY,Abs_WRITE_SAX,Abs_READ_BIT, Abs_READ_LDA, Abs_READ_LDY, Abs_READ_ORA, Abs_READ_LDX, Abs_READ_CMP, Abs_READ_ADC, Abs_READ_CPX, Abs_READ_SBC, Abs_READ_AND, Abs_READ_EOR, Abs_READ_CPY, Abs_READ_NOP,
-			//  Abs_READ_LAX,Abs_RMW_Stage4, Abs_RMW_Stage6,Abs_RMW_Stage5_INC, Abs_RMW_Stage5_DEC, Abs_RMW_Stage5_LSR, Abs_RMW_Stage5_ROL, Abs_RMW_Stage5_ASL, Abs_RMW_Stage5_ROR,Abs_RMW_Stage5_SLO, Abs_RMW_Stage5_RLA, Abs_RMW_Stage5_SRE, Abs_RMW_Stage5_RRA, Abs_RMW_Stage5_DCP, Abs_RMW_Stage5_ISC,
-			//  JMP_abs,ZpIdx_Stage3_X, ZpIdx_Stage3_Y,ZpIdx_RMW_Stage4, ZpIdx_RMW_Stage6,ZP_WRITE_STA, ZP_WRITE_STX, ZP_WRITE_STY, ZP_WRITE_SAX,ZP_RMW_Stage3, ZP_RMW_Stage5,
-			//  ZP_RMW_DEC, ZP_RMW_INC, ZP_RMW_ASL, ZP_RMW_LSR, ZP_RMW_ROR, ZP_RMW_ROL,ZP_RMW_SLO, ZP_RMW_RLA, ZP_RMW_SRE, ZP_RMW_RRA, ZP_RMW_DCP, ZP_RMW_ISC,
-			//  ZP_READ_EOR, ZP_READ_BIT, ZP_READ_ORA, ZP_READ_LDA, ZP_READ_LDY, ZP_READ_LDX, ZP_READ_CPX, ZP_READ_SBC, ZP_READ_CPY, ZP_READ_NOP, ZP_READ_ADC, ZP_READ_AND, ZP_READ_CMP, ZP_READ_LAX,
-			//  IdxInd_Stage3, IdxInd_Stage4, IdxInd_Stage5,IdxInd_Stage6_READ_ORA, IdxInd_Stage6_READ_SBC, IdxInd_Stage6_READ_LDA, IdxInd_Stage6_READ_EOR, IdxInd_Stage6_READ_CMP, IdxInd_Stage6_READ_ADC, IdxInd_Stage6_READ_AND,
-			//  IdxInd_Stage6_READ_LAX,IdxInd_Stage6_WRITE_STA, IdxInd_Stage6_WRITE_SAX,IdxInd_Stage6_RMW,IdxInd_Stage7_RMW_SLO, IdxInd_Stage7_RMW_RLA, IdxInd_Stage7_RMW_SRE, IdxInd_Stage7_RMW_RRA, IdxInd_Stage7_RMW_ISC, IdxInd_Stage7_RMW_DCP,
-			//  IdxInd_Stage8_RMW,AbsIdx_Stage3_X, AbsIdx_Stage3_Y, AbsIdx_Stage4,AbsIdx_WRITE_Stage5_STA,AbsIdx_WRITE_Stage5_SHY, AbsIdx_WRITE_Stage5_SHX,AbsIdx_WRITE_Stage5_ERROR,AbsIdx_READ_Stage4,
-			//  AbsIdx_READ_Stage5_LDA, AbsIdx_READ_Stage5_CMP, AbsIdx_READ_Stage5_SBC, AbsIdx_READ_Stage5_ADC, AbsIdx_READ_Stage5_EOR, AbsIdx_READ_Stage5_LDX, AbsIdx_READ_Stage5_AND, AbsIdx_READ_Stage5_ORA, AbsIdx_READ_Stage5_LDY, AbsIdx_READ_Stage5_NOP,
-			//  AbsIdx_READ_Stage5_LAX,AbsIdx_READ_Stage5_ERROR,AbsIdx_RMW_Stage5, AbsIdx_RMW_Stage7,AbsIdx_RMW_Stage6_ROR, AbsIdx_RMW_Stage6_DEC, AbsIdx_RMW_Stage6_INC, AbsIdx_RMW_Stage6_ASL, AbsIdx_RMW_Stage6_LSR, AbsIdx_RMW_Stage6_ROL,
-			//  AbsIdx_RMW_Stage6_SLO, AbsIdx_RMW_Stage6_RLA, AbsIdx_RMW_Stage6_SRE, AbsIdx_RMW_Stage6_RRA, AbsIdx_RMW_Stage6_DCP, AbsIdx_RMW_Stage6_ISC,IncS, DecS,
-			//  PushPCL, PushPCH, PushP, PullP, PullPCL, PullPCH_NoInc, PushA, PullA_NoInc, PullP_NoInc,PushP_BRK, PushP_NMI, PushP_IRQ, PushP_Reset, PushDummy,FetchPCLVector, FetchPCHVector,
-			//  Imp_ASL_A, Imp_ROL_A, Imp_ROR_A, Imp_LSR_A,Imp_SEC, Imp_CLI, Imp_SEI, Imp_CLD, Imp_CLC, Imp_CLV, Imp_SED,Imp_INY, Imp_DEY, Imp_INX, Imp_DEX,Imp_TSX, Imp_TXS, Imp_TAX, Imp_TAY, Imp_TYA, Imp_TXA,
-			//  Imm_CMP, Imm_ADC, Imm_AND, Imm_SBC, Imm_ORA, Imm_EOR, Imm_CPY, Imm_CPX, Imm_ANC, Imm_ASR, Imm_ARR, Imm_LXA, Imm_AXS,Imm_LDA, Imm_LDX, Imm_LDY,
-			//  Imm_Unsupported,NZ_X, NZ_Y, NZ_A,RelBranch_Stage2_BNE, RelBranch_Stage2_BPL, RelBranch_Stage2_BCC, RelBranch_Stage2_BCS, RelBranch_Stage2_BEQ, RelBranch_Stage2_BMI, RelBranch_Stage2_BVC, RelBranch_Stage2_BVS,
-			//  RelBranch_Stage2, RelBranch_Stage3, RelBranch_Stage4,_Eor, _Bit, _Cpx, _Cpy, _Cmp, _Adc, _Sbc, _Ora, _And, _Anc, _Asr, _Arr, _Lxa, _Axs,
-			//  AbsInd_JMP_Stage4, AbsInd_JMP_Stage5,IndIdx_Stage3, IndIdx_Stage4, IndIdx_READ_Stage5, IndIdx_WRITE_Stage5,
-			//  IndIdx_WRITE_Stage6_STA, IndIdx_WRITE_Stage6_SHA,IndIdx_READ_Stage6_LDA, IndIdx_READ_Stage6_CMP, IndIdx_READ_Stage6_ORA, IndIdx_READ_Stage6_SBC, IndIdx_READ_Stage6_ADC, IndIdx_READ_Stage6_AND, IndIdx_READ_Stage6_EOR,
-			//  IndIdx_READ_Stage6_LAX,IndIdx_RMW_Stage5,IndIdx_RMW_Stage6, IndIdx_RMW_Stage7_SLO, IndIdx_RMW_Stage7_RLA, IndIdx_RMW_Stage7_SRE, IndIdx_RMW_Stage7_RRA, IndIdx_RMW_Stage7_ISC, IndIdx_RMW_Stage7_DCP,IndIdx_RMW_Stage8,
-			//  End,End_ISpecial,End_SuppressInterrupt,
-			//};
+#if false
+			opcodeHandlers = new Action[] {
+				Unsupported, Fetch1, Fetch1_Real, Fetch2, Fetch3, FetchDummy,
+				NOP, JSR, IncPC,
+				Abs_WRITE_STA, Abs_WRITE_STX, Abs_WRITE_STY, Abs_WRITE_SAX, Abs_READ_BIT, Abs_READ_LDA, Abs_READ_LDY, Abs_READ_ORA, Abs_READ_LDX, Abs_READ_CMP, Abs_READ_ADC, Abs_READ_CPX, Abs_READ_SBC, Abs_READ_AND, Abs_READ_EOR, Abs_READ_CPY, Abs_READ_NOP,
+				Abs_READ_LAX, Abs_RMW_Stage4, Abs_RMW_Stage6, Abs_RMW_Stage5_INC, Abs_RMW_Stage5_DEC, Abs_RMW_Stage5_LSR, Abs_RMW_Stage5_ROL, Abs_RMW_Stage5_ASL, Abs_RMW_Stage5_ROR, Abs_RMW_Stage5_SLO, Abs_RMW_Stage5_RLA, Abs_RMW_Stage5_SRE, Abs_RMW_Stage5_RRA, Abs_RMW_Stage5_DCP, Abs_RMW_Stage5_ISC,
+				JMP_abs, ZpIdx_Stage3_X, ZpIdx_Stage3_Y, ZpIdx_RMW_Stage4, ZpIdx_RMW_Stage6, ZP_WRITE_STA, ZP_WRITE_STX, ZP_WRITE_STY, ZP_WRITE_SAX, ZP_RMW_Stage3, ZP_RMW_Stage5,
+				ZP_RMW_DEC, ZP_RMW_INC, ZP_RMW_ASL, ZP_RMW_LSR, ZP_RMW_ROR, ZP_RMW_ROL, ZP_RMW_SLO, ZP_RMW_RLA, ZP_RMW_SRE, ZP_RMW_RRA, ZP_RMW_DCP, ZP_RMW_ISC,
+				ZP_READ_EOR, ZP_READ_BIT, ZP_READ_ORA, ZP_READ_LDA, ZP_READ_LDY, ZP_READ_LDX, ZP_READ_CPX, ZP_READ_SBC, ZP_READ_CPY, ZP_READ_NOP, ZP_READ_ADC, ZP_READ_AND, ZP_READ_CMP, ZP_READ_LAX,
+				IdxInd_Stage3, IdxInd_Stage4, IdxInd_Stage5, IdxInd_Stage6_READ_ORA, IdxInd_Stage6_READ_SBC, IdxInd_Stage6_READ_LDA, IdxInd_Stage6_READ_EOR, IdxInd_Stage6_READ_CMP, IdxInd_Stage6_READ_ADC, IdxInd_Stage6_READ_AND,
+				IdxInd_Stage6_READ_LAX, IdxInd_Stage6_WRITE_STA, IdxInd_Stage6_WRITE_SAX, IdxInd_Stage6_RMW, IdxInd_Stage7_RMW_SLO, IdxInd_Stage7_RMW_RLA, IdxInd_Stage7_RMW_SRE, IdxInd_Stage7_RMW_RRA, IdxInd_Stage7_RMW_ISC, IdxInd_Stage7_RMW_DCP,
+				IdxInd_Stage8_RMW, AbsIdx_Stage3_X, AbsIdx_Stage3_Y, AbsIdx_Stage4, AbsIdx_WRITE_Stage5_STA, AbsIdx_WRITE_Stage5_SHY, AbsIdx_WRITE_Stage5_SHX, AbsIdx_WRITE_Stage5_ERROR, AbsIdx_READ_Stage4,
+				AbsIdx_READ_Stage5_LDA, AbsIdx_READ_Stage5_CMP, AbsIdx_READ_Stage5_SBC, AbsIdx_READ_Stage5_ADC, AbsIdx_READ_Stage5_EOR, AbsIdx_READ_Stage5_LDX, AbsIdx_READ_Stage5_AND, AbsIdx_READ_Stage5_ORA, AbsIdx_READ_Stage5_LDY, AbsIdx_READ_Stage5_NOP,
+				AbsIdx_READ_Stage5_LAX, AbsIdx_READ_Stage5_ERROR, AbsIdx_RMW_Stage5, AbsIdx_RMW_Stage7, AbsIdx_RMW_Stage6_ROR, AbsIdx_RMW_Stage6_DEC, AbsIdx_RMW_Stage6_INC, AbsIdx_RMW_Stage6_ASL, AbsIdx_RMW_Stage6_LSR, AbsIdx_RMW_Stage6_ROL,
+				AbsIdx_RMW_Stage6_SLO, AbsIdx_RMW_Stage6_RLA, AbsIdx_RMW_Stage6_SRE, AbsIdx_RMW_Stage6_RRA, AbsIdx_RMW_Stage6_DCP, AbsIdx_RMW_Stage6_ISC, IncS, DecS,
+				PushPCL, PushPCH, PushP, PullP, PullPCL, PullPCH_NoInc, PushA, PullA_NoInc, PullP_NoInc, PushP_BRK, PushP_NMI, PushP_IRQ, PushP_Reset, PushDummy, FetchPCLVector, FetchPCHVector,
+				Imp_ASL_A, Imp_ROL_A, Imp_ROR_A, Imp_LSR_A, Imp_SEC, Imp_CLI, Imp_SEI, Imp_CLD, Imp_CLC, Imp_CLV, Imp_SED, Imp_INY, Imp_DEY, Imp_INX, Imp_DEX, Imp_TSX, Imp_TXS, Imp_TAX, Imp_TAY, Imp_TYA, Imp_TXA,
+				Imm_CMP, Imm_ADC, Imm_AND, Imm_SBC, Imm_ORA, Imm_EOR, Imm_CPY, Imm_CPX, Imm_ANC, Imm_ASR, Imm_ARR, Imm_LXA, Imm_AXS, Imm_LDA, Imm_LDX, Imm_LDY,
+				Imm_Unsupported, NZ_X, NZ_Y, NZ_A, RelBranch_Stage2_BNE, RelBranch_Stage2_BPL, RelBranch_Stage2_BCC, RelBranch_Stage2_BCS, RelBranch_Stage2_BEQ, RelBranch_Stage2_BMI, RelBranch_Stage2_BVC, RelBranch_Stage2_BVS,
+				RelBranch_Stage2, RelBranch_Stage3, RelBranch_Stage4, _Eor, _Bit, _Cpx, _Cpy, _Cmp, _Adc, _Sbc, _Ora, _And, _Anc, _Asr, _Arr, _Lxa, _Axs,
+				AbsInd_JMP_Stage4, AbsInd_JMP_Stage5, IndIdx_Stage3, IndIdx_Stage4, IndIdx_READ_Stage5, IndIdx_WRITE_Stage5,
+				IndIdx_WRITE_Stage6_STA, IndIdx_WRITE_Stage6_SHA, IndIdx_READ_Stage6_LDA, IndIdx_READ_Stage6_CMP, IndIdx_READ_Stage6_ORA, IndIdx_READ_Stage6_SBC, IndIdx_READ_Stage6_ADC, IndIdx_READ_Stage6_AND, IndIdx_READ_Stage6_EOR,
+				IndIdx_READ_Stage6_LAX, IndIdx_RMW_Stage5, IndIdx_RMW_Stage6, IndIdx_RMW_Stage7_SLO, IndIdx_RMW_Stage7_RLA, IndIdx_RMW_Stage7_SRE, IndIdx_RMW_Stage7_RRA, IndIdx_RMW_Stage7_ISC, IndIdx_RMW_Stage7_DCP, IndIdx_RMW_Stage8,
+				End, End_ISpecial, End_SuppressInterrupt,
+			};
+#endif
 		}
 
 		private const int VOP_Fetch1 = 256;
