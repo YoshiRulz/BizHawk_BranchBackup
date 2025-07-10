@@ -9,27 +9,62 @@ namespace BizHawk.Emulation.Cores.Computers.AmstradCPC
 {
 	public class LibFz80Wrapper
 	{
-		public const int Z80_PIN_M1 = 24;		// machine cycle 1
-		public const int Z80_PIN_MREQ = 25;     // memory request
-		public const int Z80_PIN_IORQ = 26;     // input/output request
-		public const int Z80_PIN_RD = 27;		// read
-		public const int Z80_PIN_WR = 28;		// write
-		public const int Z80_PIN_HALT = 29;     // halt state
-		public const int Z80_PIN_RFSH = 34;     // refresh
+		/// <summary>machine cycle 1</summary>
+		public const int Z80_PIN_M1 = 24;
 
-		public const int Z80_PIN_INT = 30;		// interrupt request
-		public const int Z80_PIN_RES = 31;		// reset requested
-		public const int Z80_PIN_NMI = 32;		// non-maskable interrupt
-		public const int Z80_PIN_WAIT = 33;     // wait requested
+		/// <summary>memory request</summary>
+		public const int Z80_PIN_MREQ = 25;
 
-		public const int Z80_FLAG_C = 0;		// carry
-		public const int Z80_FLAG_N = 1;		// add/subtract
-		public const int Z80_FLAG_P = 2;        // parity/overflow
-		public const int Z80_FLAG_3 = 3;		// undocumented bit 3
-		public const int Z80_FLAG_H = 4;        // half carry
-		public const int Z80_FLAG_5 = 5;        // undocumented bit 5
-		public const int Z80_FLAG_Z = 6;		// zero
-		public const int Z80_FLAG_S = 7;		// sign
+		/// <summary>input/output request</summary>
+		public const int Z80_PIN_IORQ = 26;
+
+		/// <summary>read</summary>
+		public const int Z80_PIN_RD = 27;
+
+		/// <summary>write</summary>
+		public const int Z80_PIN_WR = 28;
+
+		/// <summary>halt state</summary>
+		public const int Z80_PIN_HALT = 29;
+
+		/// <summary>refresh</summary>
+		public const int Z80_PIN_RFSH = 34;
+
+		/// <summary>interrupt request</summary>
+		public const int Z80_PIN_INT = 30;
+
+		/// <summary>reset requested</summary>
+		public const int Z80_PIN_RES = 31;
+
+		/// <summary>non-maskable interrupt</summary>
+		public const int Z80_PIN_NMI = 32;
+
+		/// <summary>wait requested</summary>
+		public const int Z80_PIN_WAIT = 33;
+
+		/// <summary>carry</summary>
+		public const int Z80_FLAG_C = 0;
+
+		/// <summary>add/subtract</summary>
+		public const int Z80_FLAG_N = 1;
+
+		/// <summary>parity/overflow</summary>
+		public const int Z80_FLAG_P = 2;
+
+		/// <summary>undocumented bit 3</summary>
+		public const int Z80_FLAG_3 = 3;
+
+		/// <summary>half carry</summary>
+		public const int Z80_FLAG_H = 4;
+
+		/// <summary>undocumented bit 5</summary>
+		public const int Z80_FLAG_5 = 5;
+
+		/// <summary>zero</summary>
+		public const int Z80_FLAG_Z = 6;
+
+		/// <summary>sign</summary>
+		public const int Z80_FLAG_S = 7;
 
 		/// <summary>
 		/// Z80 pin configuration

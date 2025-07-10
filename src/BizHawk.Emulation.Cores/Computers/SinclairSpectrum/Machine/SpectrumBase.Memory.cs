@@ -17,14 +17,14 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 		/// <summary>
 		/// RAM Banks
 		/// </summary>
-		public byte[] RAM0 = new byte[0x4000];  // Bank 0
-		public byte[] RAM1 = new byte[0x4000];  // Bank 1
-		public byte[] RAM2 = new byte[0x4000];  // Bank 2
-		public byte[] RAM3 = new byte[0x4000];  // Bank 3
-		public byte[] RAM4 = new byte[0x4000];  // Bank 4
-		public byte[] RAM5 = new byte[0x4000];  // Bank 5
-		public byte[] RAM6 = new byte[0x4000];  // Bank 6
-		public byte[] RAM7 = new byte[0x4000];  // Bank 7
+		public byte[] RAM0 = new byte[0x4000]; // Bank 0
+		public byte[] RAM1 = new byte[0x4000]; // Bank 1
+		public byte[] RAM2 = new byte[0x4000]; // Bank 2
+		public byte[] RAM3 = new byte[0x4000]; // Bank 3
+		public byte[] RAM4 = new byte[0x4000]; // Bank 4
+		public byte[] RAM5 = new byte[0x4000]; // Bank 5
+		public byte[] RAM6 = new byte[0x4000]; // Bank 6
+		public byte[] RAM7 = new byte[0x4000]; // Bank 7
 
 		/// <summary>
 		/// Signs that the shadow screen is now displaying

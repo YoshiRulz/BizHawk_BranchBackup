@@ -9,12 +9,18 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 	public class WavHeader
 	{
 		// RIFF chunk (12 bytes)
-		public int chunkID;           // "RIFF"
+		/// <remarks><c>"RIFF"u8</c></remarks>
+		public int chunkID;
+
 		public int fileSize;
-		public int riffType;          // "WAVE"
+
+		/// <remarks><c>"WAVE"u8</c></remarks>
+		public int riffType;
 
 		// Format chunk (24 bytes)
-		public int fmtID;             // "fmt "
+
+		/// <remarks><c>"fmt "u8</c></remarks>
+		public int fmtID;
 		public int fmtSize;
 		public short fmtCode;
 		public short channels;
@@ -25,8 +31,12 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 		public short fmtExtraSize;
 
 		// Data chunk
-		public int dataID;            // "data"
-		public int dataSize;          // The data size should be file size - 36 bytes.
+
+		/// <remarks><c>"data"u8</c></remarks>
+		public int dataID;
+
+		/// <summary>should be file size less 36 bytes</summary>
+		public int dataSize;
 
 
 		public void Deserialize(Stream stream)

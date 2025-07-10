@@ -125,9 +125,8 @@ namespace BizHawk.Emulation.Cores.Computers.AmstradCPC
 			// - If a VSYNC is not detected in time, the PLL will eventually move the beam back to the top
 			// - Unsure what the vertical screen time for this action is.
 
-			int hHold = 118;	// pixels - approx (71.43 - 64) * 16
-			int vHold = 3;      // scanlines
-
+			int hHold = 118; // pixels - approx (71.43 - 64) * 16
+			int vHold = 3; // scanlines
 
 			// * horizontal movement *
 			// gun moves left to right at a rate of 16 pixels per usec
@@ -246,8 +245,12 @@ namespace BizHawk.Emulation.Cores.Computers.AmstradCPC
 
 
 		public int BackgroundColor => 0;
-		public int VsyncNumerator => 16_000_000;        // pixel clock
-		public int VsyncDenominator => 319_488;         // 1024 * 312
+
+		public int VsyncNumerator
+			=> 16_000_000; // pixel clock
+
+		public int VsyncDenominator
+			=> 1024 * 312;
 
 		public int BufferWidth => HDisplayable;
 		public int BufferHeight => VDisplayable;

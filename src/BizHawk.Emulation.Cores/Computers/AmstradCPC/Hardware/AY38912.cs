@@ -501,19 +501,19 @@ namespace BizHawk.Emulation.Cores.Computers.AmstradCPC
 		private static readonly List<uint[]> PanTabs = new List<uint[]>
 		{
             // MONO
-            new uint[] { 50,50, 50,50, 50,50 },
+            new uint[] {  50,  50,	 50,  50,	 50,  50 },
             // ABC
-            new uint[] { 100,10,  66,66,   10,100 },
+            new uint[] { 100,  10,	 66,  66,	 10, 100 },
             // ACB
-            new uint[] { 100,10,  10,100,  66,66 },
+            new uint[] { 100,  10,	 10, 100,	 66,  66 },
             // BAC
-            new uint[] { 66,66,   100,10,  10,100 },
+            new uint[] {  66,  66,	100,  10,	 10, 100 },
             // BCA
-            new uint[] { 10,100,  100,10,  66,66 },
+            new uint[] {  10, 100,	100,  10,	 66,  66 },
             // CAB
-            new uint[] { 66,66,   10,100,  100,10 },
+            new uint[] {  66,  66,	 10, 100,	100,  10 },
             // CBA
-            new uint[] { 10,100,  66,66,   100,10 }
+            new uint[] {  10, 100,	 66,  66,	100,  10 },
 		};
 
 		/// <summary>

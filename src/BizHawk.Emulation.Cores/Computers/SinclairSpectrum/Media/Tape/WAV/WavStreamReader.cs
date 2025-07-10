@@ -100,10 +100,17 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 			return (int) (fSample * int.MaxValue);
 		}
 
-		private const int WAVE_FORMAT_PCM = 1;              /* PCM */
-		private const int WAVE_FORMAT_IEEE_FLOAT = 3;       /* IEEE float */
-		private const int WAVE_FORMAT_ALAW = 6;             /* 8-bit ITU-T G.711 A-law */
-		private const int WAVE_FORMAT_MULAW = 7;            /* 8-bit ITU-T G.711 µ-law */
-		private const int WAVE_FORMAT_EXTENSIBLE = 0xFFFE;  /* Determined by SubFormat */
+		private const int WAVE_FORMAT_PCM = 1;
+
+		private const int WAVE_FORMAT_IEEE_FLOAT = 3;
+
+		/// <summary>8-bit ITU-T G.711 A-law</summary>
+		private const int WAVE_FORMAT_ALAW = 6;
+
+		/// <summary>8-bit ITU-T G.711 µ-law</summary>
+		private const int WAVE_FORMAT_MULAW = 7;
+
+		/// <summary>Determined by SubFormat</summary>
+		private const int WAVE_FORMAT_EXTENSIBLE = 0xFFFE;
 	}
 }

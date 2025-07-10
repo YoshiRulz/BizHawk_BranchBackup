@@ -159,7 +159,7 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 									found = CPCFloppyDisk.SplitDoubleSided(m, working);
 									break;
 								case DiskType.UDI:
-									found =  UDI1_0FloppyDisk.SplitDoubleSided(m, working);
+									found = UDI1_0FloppyDisk.SplitDoubleSided(m, working);
 									break;
 							}
 

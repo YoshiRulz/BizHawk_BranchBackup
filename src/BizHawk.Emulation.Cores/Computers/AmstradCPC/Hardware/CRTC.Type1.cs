@@ -30,13 +30,13 @@ namespace BizHawk.Emulation.Cores.Computers.AmstradCPC
 			// horizontal character counter clocked
 			HCC++;
 
-			if (HCC == R0_HorizontalTotal + 1)          // C0 == R0
+			if (HCC == R0_HorizontalTotal + 1) // C0 == R0
 			{
 				// new scanline
 				// increment raster counter
 				VLC++;
 
-				if (VLC == R9_MaxScanline + 1)              // C9 == R9
+				if (VLC == R9_MaxScanline + 1) // C9 == R9
 				{
 					// new character row
 					// vertical character counter reset
@@ -45,13 +45,13 @@ namespace BizHawk.Emulation.Cores.Computers.AmstradCPC
 					// incremement vertical character counter
 					VCC++;
 
-					if (VCC == R6_VerticalDisplayed)        // C4 == R6
+					if (VCC == R6_VerticalDisplayed) // C4 == R6
 					{
 						// vertical display is disabled
 						latch_vdisp = false;
 					}
 
-					if (VCC == R4_VerticalTotal + 1)        // C4 == R4
+					if (VCC == R4_VerticalTotal + 1) // C4 == R4
 					{
 						// new CRTC frame
 						// vertical character counter reset
@@ -64,8 +64,8 @@ namespace BizHawk.Emulation.Cores.Computers.AmstradCPC
 						ma_store = (Register[R12_START_ADDR_H] << 8) | Register[R13_START_ADDR_L];
 					}
 
-					if (VCC == R7_VerticalSyncPosition      // C4 == R7
-						&& !VSYNC)							// ACCC 16.3: It is not possible to trigger or inhibit VSYNC during a VSYNC
+					if (VCC == R7_VerticalSyncPosition // C4 == R7
+						&& !VSYNC) // ACCC 16.3: It is not possible to trigger or inhibit VSYNC during a VSYNC
 					{
 						// VSYNC enabled
 						VSYNC = true;
