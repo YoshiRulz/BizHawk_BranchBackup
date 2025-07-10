@@ -92,24 +92,20 @@ namespace BizHawk.Emulation.Cores.Computers.SinclairSpectrum
 		public override void Read(byte[] data)
 		{
 			/*
-				The .TAP files contain blocks of tape-saved data. All blocks start with two bytes specifying how many bytes will follow (not counting the two length bytes). Then raw tape data follows, including the flag and checksum bytes. The checksum is the bitwise XOR of all bytes including the flag byte. For example, when you execute the line SAVE "ROM" CODE 0,2 this will result:
-
-				|------ Spectrum-generated data -------|       |---------|
-
-			   13 00 00 03 52 4f 4d 7x20 02 00 00 00 00 80 f1 04 00 ff f3 af a3
-
-			   ^^^^^...... first block is 19 bytes (17 bytes+flag+checksum)
-					 ^^... flag byte (A reg, 00 for headers, ff for data blocks)
-						^^ first byte of header, indicating a code block
-
-			   file name ..^^^^^^^^^^^^^
-			   header info ..............^^^^^^^^^^^^^^^^^
-			   checksum of header .........................^^
-			   length of second block ........................^^^^^
-			   flag byte ............................................^^
-			   first two bytes of rom .................................^^^^^
-			   checksum (checkbittoggle would be a better name!).............^^
-			*/
+			 * The .TAP files contain blocks of tape-saved data. All blocks start with two bytes specifying how many bytes will follow (not counting the two length bytes). Then raw tape data follows, including the flag and checksum bytes. The checksum is the bitwise XOR of all bytes including the flag byte. For example, when you execute the line SAVE "ROM" CODE 0,2 this will result:
+			 * |------ Spectrum-generated data -------|       |---------|
+			 * 13 00 00 03 52 4f 4d 7x20 02 00 00 00 00 80 f1 04 00 ff f3 af a3
+			 * ^^^^^...... first block is 19 bytes (17 bytes+flag+checksum)
+			 *       ^^... flag byte (A reg, 00 for headers, ff for data blocks)
+			 *          ^^ first byte of header, indicating a code block
+			 * file name ..^^^^^^^^^^^^^
+			 * header info ..............^^^^^^^^^^^^^^^^^
+			 * checksum of header .........................^^
+			 * length of second block ........................^^^^^
+			 * flag byte ...........................................^^
+			 * first two bytes of rom .................................^^^^^
+			 * checksum (checkbittoggle would be a better name!).............^^
+			 */
 
 			// clear existing tape blocks
 			_datacorder.DataBlocks.Clear();
