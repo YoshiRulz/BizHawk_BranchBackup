@@ -2,10 +2,42 @@
 
 namespace BizHawk.Tests.Client.Common.Movie
 {
-	[TestClass]
-	public class TasMovieTests
+	public abstract class TasMovieTests
 	{
-		internal static TasMovie MakeMovie(int numberOfFrames)
+		[TestClass]
+		public sealed class AllOperationsFlagChanges : TasMovieTests
+		{
+			[TestInitialize]
+			public void BeforeEach()
+			{
+				InitMovie(numberOfFrames: 10);
+				Movie.ClearChanges();
+			}
+
+			[TestCleanup]
+			public void AfterEach()
+				=> Assert.IsTrue(Movie.Changes);
+		}
+
+		[TestClass]
+		public sealed class AllOperationsProduceSingleInvalidation : TasMovieTests
+		{
+			private int _invalidations;
+
+			[TestInitialize]
+			public void BeforeEach()
+			{
+				InitMovie(numberOfFrames: 10);
+				_invalidations = 0;
+				Movie.GreenzoneInvalidated = _ => _invalidations++;
+			}
+
+			[TestCleanup]
+			public void AfterEach()
+				=> Assert.AreEqual(1, _invalidations);
+		}
+
+		internal static ITasMovie MakeMovie(int numberOfFrames)
 		{
 			FakeEmulator emu = new FakeEmulator();
 			FakeMovieSession session = new(emu) { Movie = null! };
@@ -18,80 +50,122 @@ namespace BizHawk.Tests.Client.Common.Movie
 			return movie;
 		}
 
-		public static void TestAllOperations(ITasMovie movie, Action PreOperation, Action PostOperation)
+		private Bk2Controller controllerA = null!;
+
+		private Bk2Controller controllerEmpty = null!;
+
+		protected string entryA = null!;
+
+		private string entryEmpty = null!;
+
+		protected ITasMovie Movie = null!;
+
+		protected void InitMovie(int numberOfFrames)
 		{
-			Bk2Controller controllerEmpty = new Bk2Controller(movie.Emulator.ControllerDefinition);
-			string entryEmpty = Bk2LogEntryGenerator.GenerateLogEntry(controllerEmpty);
-			Bk2Controller controllerA = new Bk2Controller(movie.Emulator.ControllerDefinition);
+			Movie = MakeMovie(numberOfFrames);
+			controllerEmpty = new(Movie.Emulator.ControllerDefinition);
+			entryEmpty = Bk2LogEntryGenerator.GenerateLogEntry(controllerEmpty);
+			controllerA = new(Movie.Emulator.ControllerDefinition);
 			controllerA.SetBool("A", true);
-			string entryA = Bk2LogEntryGenerator.GenerateLogEntry(controllerA);
-
+			entryA = Bk2LogEntryGenerator.GenerateLogEntry(controllerA);
 			// Make sure all operations actually do something.
-			movie.SetBoolState(3, "A", true);
-
-			void TestForSingleOperation(Action a)
-			{
-				PreOperation();
-				a();
-				PostOperation();
-				movie.ChangeLog.Undo();
-			}
-
-			TestForSingleOperation(() => movie.RecordFrame(1, controllerA));
-			TestForSingleOperation(() => movie.Truncate(3));
-			TestForSingleOperation(() => movie.PokeFrame(1, controllerA));
-			TestForSingleOperation(() => movie.SetFrame(1, entryA));
-			TestForSingleOperation(() => movie.ClearFrame(3));
-
-			TestForSingleOperation(() => movie.InsertInput(2, entryA));
-			TestForSingleOperation(() => movie.InsertInput(2, [ entryA, entryEmpty, entryA, entryEmpty ]));
-			TestForSingleOperation(() => movie.InsertInput(2, [ controllerA, controllerEmpty, controllerA, controllerEmpty ]));
-
-			TestForSingleOperation(() => movie.RemoveFrame(2));
-			TestForSingleOperation(() => movie.RemoveFrames(2, 4));
-			TestForSingleOperation(() => movie.RemoveFrames([ 2, 4, 6 ]));
-
-			TestForSingleOperation(() => movie.CopyOverInput(2, [ controllerA, controllerEmpty ]));
-			TestForSingleOperation(() => movie.InsertEmptyFrame(2, 2));
-
-			TestForSingleOperation(() => movie.ToggleBoolState(2, "B"));
-			TestForSingleOperation(() => movie.SetBoolState(3, "B", true));
-			TestForSingleOperation(() => movie.SetBoolStates(3, 2, "B", true));
-
-			TestForSingleOperation(() => movie.SetAxisState(2, "Stick", 10));
-			TestForSingleOperation(() => movie.SetAxisStates(3, 2, "Stick", 20));
-
-			// actions that can also extend the movie
-			TestForSingleOperation(() => movie.CopyOverInput(9, [ controllerA, controllerEmpty, controllerA ]));
-			TestForSingleOperation(() => movie.ToggleBoolState(15, "B"));
-			TestForSingleOperation(() => movie.SetBoolState(15, "B", true));
-			TestForSingleOperation(() => movie.SetBoolStates(15, 2, "B", true));
-			TestForSingleOperation(() => movie.SetAxisState(15, "Stick", 10));
-			TestForSingleOperation(() => movie.SetAxisStates(15, 2, "Stick", 20));
+			Movie.SetBoolState(3, "A", true);
 		}
 
 		[TestMethod]
-		public void AllOperationsFlagChanges()
-		{
-			ITasMovie movie = MakeMovie(10);
-
-			TestAllOperations(movie,
-				movie.ClearChanges,
-				() => Assert.IsTrue(movie.Changes)
-			);
-		}
+		public void TestRecordFrame()
+			=> Movie.RecordFrame(1, controllerA);
 
 		[TestMethod]
-		public void AllOperationsProduceSingleInvalidation()
-		{
-			ITasMovie movie = MakeMovie(10);
-			int invalidations = 0;
-			movie.GreenzoneInvalidated = (_) => invalidations++;
+		public void TestTruncate()
+			=> Movie.Truncate(3);
 
-			TestAllOperations(movie,
-				() => invalidations = 0,
-				() => Assert.AreEqual(1, invalidations)
-			);
-		}
+		[TestMethod]
+		public void TestPokeFrame()
+			=> Movie.PokeFrame(1, controllerA);
+
+		[TestMethod]
+		public void TestSetFrame()
+			=> Movie.SetFrame(1, entryA);
+
+		[TestMethod]
+		public void TestClearFrame()
+			=> Movie.ClearFrame(3);
+
+		[TestMethod]
+		public void TestInsertInputSingleString()
+			=> Movie.InsertInput(2, entryA);
+
+		[TestMethod]
+		public void TestInsertInputStrings()
+			=> Movie.InsertInput(2, [ entryA, entryEmpty, entryA, entryEmpty ]);
+
+		[TestMethod]
+		public void TestInsertInputControllers()
+			=> Movie.InsertInput(2, [ controllerA, controllerEmpty, controllerA, controllerEmpty ]);
+
+		[TestMethod]
+		public void TestRemoveFrame()
+			=> Movie.RemoveFrame(2);
+
+		[TestMethod]
+		public void TestRemoveFramesRange()
+			=> Movie.RemoveFrames(2, 4);
+
+		[TestMethod]
+		public void TestRemoveFramesList()
+			=> Movie.RemoveFrames([ 2, 4, 6 ]);
+
+		[TestMethod]
+		public void TestCopyOverInputOverwriting()
+			=> Movie.CopyOverInput(2, [ controllerA, controllerEmpty ]);
+
+		[TestMethod]
+		public void TestInsertEmptyFrame()
+			=> Movie.InsertEmptyFrame(2, 2);
+
+		[TestMethod]
+		public void TestToggleBoolStateOverwriting()
+			=> Movie.ToggleBoolState(2, "B");
+
+		[TestMethod]
+		public void TestSetBoolStateSingleOverwriting()
+			=> Movie.SetBoolState(3, "B", true);
+
+		[TestMethod]
+		public void TestSetBoolStatesOverwriting()
+			=> Movie.SetBoolStates(3, 2, "B", true);
+
+		[TestMethod]
+		public void TestSetAxisStateSingleOverwriting()
+			=> Movie.SetAxisState(2, "Stick", 10);
+
+		[TestMethod]
+		public void TestSetAxisStatesOverwriting()
+			=> Movie.SetAxisStates(3, 2, "Stick", 20);
+
+		[TestMethod]
+		public void TestCopyOverInputAppending()
+			=> Movie.CopyOverInput(9, [ controllerA, controllerEmpty, controllerA ]);
+
+		[TestMethod]
+		public void TestToggleBoolStateAppending()
+			=> Movie.ToggleBoolState(15, "B");
+
+		[TestMethod]
+		public void TestSetBoolStateSingleAppending()
+			=> Movie.SetBoolState(15, "B", true);
+
+		[TestMethod]
+		public void TestSetBoolStatesAppending()
+			=> Movie.SetBoolStates(15, 2, "B", true);
+
+		[TestMethod]
+		public void TestSetAxisStateSingleAppending()
+			=> Movie.SetAxisState(15, "Stick", 10);
+
+		[TestMethod]
+		public void TestSetAxisStatesAppending()
+			=> Movie.SetAxisStates(15, 2, "Stick", 20);
 	}
 }

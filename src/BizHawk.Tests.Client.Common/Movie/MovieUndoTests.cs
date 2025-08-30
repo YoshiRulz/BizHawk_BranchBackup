@@ -270,49 +270,49 @@ namespace BizHawk.Tests.Client.Common.Movie
 			Assert.AreEqual(8, movie.Markers[1].Frame);
 		}
 
-		[TestMethod]
-		public void AllOperationsRespectBatching()
+		[TestClass]
+		public sealed class AllOperationsRespectBatching : TasMovieTests
 		{
-			ITasMovie movie = TasMovieTests.MakeMovie(10);
+			private int _beginIndex;
 
-			// Some actions can move markers.
-			movie.Markers.Add(9, "");
-			movie.BindMarkersToInput = true;
+			[TestInitialize]
+			public void BeforeEach()
+			{
+				InitMovie(numberOfFrames: 10);
+				// Some actions can move markers.
+				Movie.Markers.Add(9, "");
+				Movie.BindMarkersToInput = true;
+				_beginIndex = Movie.ChangeLog.UndoIndex;
+				Movie.ChangeLog.BeginNewBatch();
+			}
 
-			Bk2Controller controllerA = new Bk2Controller(movie.Emulator.ControllerDefinition);
-			controllerA.SetBool("A", true);
-			string entryA = Bk2LogEntryGenerator.GenerateLogEntry(controllerA);
-
-			int beginIndex = 0;
-			TasMovieTests.TestAllOperations(movie,
-				() =>
-				{
-					beginIndex = movie.ChangeLog.UndoIndex;
-					movie.ChangeLog.BeginNewBatch();
-				},
-				() =>
-				{
-					movie.SetFrame(0, entryA);
-					movie.ChangeLog.EndBatch();
-
-					Assert.AreEqual(1, movie.ChangeLog.UndoIndex - beginIndex);
-				});
+			[TestCleanup]
+			public void AfterEach()
+			{
+				Movie.SetFrame(0, entryA);
+				Movie.ChangeLog.EndBatch();
+				Assert.AreEqual(1, Movie.ChangeLog.UndoIndex - _beginIndex);
+			}
 		}
 
-		[TestMethod]
-		public void AllOperationsGiveOneUndo()
+		[TestClass]
+		public sealed class AllOperationsGiveOneUndo : TasMovieTests
 		{
-			ITasMovie movie = TasMovieTests.MakeMovie(10);
+			private int _beginIndex;
 
-			// Some actions can move markers.
-			movie.Markers.Add(9, "");
-			movie.BindMarkersToInput = true;
+			[TestInitialize]
+			public void BeforeEach()
+			{
+				InitMovie(numberOfFrames: 10);
+				// Some actions can move markers.
+				Movie.Markers.Add(9, "");
+				Movie.BindMarkersToInput = true;
+				_beginIndex = Movie.ChangeLog.UndoIndex;
+			}
 
-			int beginIndex = 0;
-			TasMovieTests.TestAllOperations(movie,
-				() => beginIndex = movie.ChangeLog.UndoIndex,
-				() => Assert.AreEqual(1, movie.ChangeLog.UndoIndex - beginIndex)
-			);
+			[TestCleanup]
+			public void AfterEach()
+				=> Assert.AreEqual(1, Movie.ChangeLog.UndoIndex - _beginIndex);
 		}
 
 		[TestMethod]
