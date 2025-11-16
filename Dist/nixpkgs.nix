@@ -1,8 +1,4 @@
 {
-	nixpkgs-25_05 = system: import (builtins.fetchTarball {
-		url = "https://github.com/NixOS/nixpkgs/archive/25.05.tar.gz";
-		sha256 = "1915r28xc4znrh2vf4rrjnxldw2imysz819gzhk9qlrkqanmfsxd";
-	}) { inherit system; };
 	nixpkgs-24_05 = system: import (builtins.fetchTarball {
 		url = "https://github.com/YoshiRulz/nixpkgs/archive/a9302067440792f6137e4e96f3bfcbb1ed086eb2.tar.gz"; # .NET 10 backported to 24.05, since that was the last release before ebd3b37e6, see https://github.com/NixOS/nixpkgs/pull/327651#issuecomment-3499977198
 		sha256 = "1app1qh40blfr2r1dkkpp7r22kmbq50x4zicrak8rrcgamxd0lxb";
