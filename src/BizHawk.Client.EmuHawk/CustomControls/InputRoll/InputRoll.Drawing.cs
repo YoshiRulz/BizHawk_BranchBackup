@@ -11,30 +11,58 @@ namespace BizHawk.Client.EmuHawk
 		private const int WM_SETREDRAW = 0x000B;
 
 		private int _suspendCount = 0;
+		private List<Rectangle> _invalidations = new();
+		private bool _invalidatingByResumeDrawing = false;
+
+		private bool _scrollbarVNeedsDraw;
+		private bool _scrollbarHNeedsDraw;
 
 		public void SuspendDrawing()
 		{
-			_suspendCount++;
-			if (!OSTailoredCode.IsUnixHost)
+			if (OSTailoredCode.IsUnixHost) return;
+
+			if (_suspendCount == 0)
 			{
-				WmImports.SendMessageW(Handle, WM_SETREDRAW, (IntPtr) 0, IntPtr.Zero);
+				(this as Control).SuspendDrawing();
 			}
+			_suspendCount++;
 		}
 
 		public void ResumeDrawing()
 		{
 			_suspendCount--;
 			if (_suspendCount > 0) return;
+			if (OSTailoredCode.IsUnixHost) return;
 
-			if (!OSTailoredCode.IsUnixHost)
+			if (_suspendCount < 0) _suspendCount = 0;
+
+			(this as Control).ResumeDrawing();
+			_invalidatingByResumeDrawing = true;
+			// Per the Windows docs, ResumeDrawing will not trigger a paint, we have to manually do that.
+			// We don't clear the list here; wait until the paint actually happens.
+			foreach (Rectangle r in _invalidations)
 			{
-				WmImports.SendMessageW(Handle, WM_SETREDRAW, (IntPtr) 1, IntPtr.Zero);
-				Refresh(); // per docs, an explicit redraw is required
+				Invalidate(r);
 			}
+
+			if (_scrollbarHNeedsDraw) _hBar.Invalidate();
+			if (_scrollbarVNeedsDraw) _vBar.Invalidate();
+
+			_invalidatingByResumeDrawing = false;
+		}
+		protected override void OnInvalidated(InvalidateEventArgs e)
+		{
+			// Calling SuspendDrawing will cancel any pending paints, and thus retroactively ignore prior invalidations.
+			// We do not want that behavior, so we manually track all invalidations that haven't yet been painted.
+			if (!_invalidatingByResumeDrawing) _invalidations.Add(e.InvalidRect);
+			base.OnInvalidated(e);
 		}
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
+			_invalidations.Clear();
+			_scrollbarHNeedsDraw = _scrollbarVNeedsDraw = false; // ideally this would happen when the scroll bars paint, be we don't have an event for that
+
 			using (_renderer.LockGraphics(e.Graphics))
 			{
 				// White Background
@@ -73,14 +101,14 @@ namespace BizHawk.Client.EmuHawk
 				int length = endIndex - startIndex;
 				CellList selectedCells = length == _selectedItems.Count ? _selectedItems : _selectedItems.Slice(startIndex, length);
 
+				// Background
+				DrawBg(visibleColumns, e.ClipRectangle, firstVisibleRow, lastVisibleRow, selectedCells);
+
 				if (HorizontalOrientation || e.ClipRectangle.Y <= ColumnHeight)
 				{
 					DrawColumnBg(visibleColumns, e.ClipRectangle);
 					DrawColumnText(visibleColumns);
 				}
-
-				// Background
-				DrawBg(visibleColumns, e.ClipRectangle, firstVisibleRow, lastVisibleRow, selectedCells);
 
 				// Foreground
 				DrawData(visibleColumns, firstVisibleRow, lastVisibleRow, selectedCells);
@@ -584,30 +612,31 @@ namespace BizHawk.Client.EmuHawk
 		private void DrawCellBG(Color color, Cell cell)
 		{
 			int x, y, w, h;
+			int gridWidth = GridLines ? 1 : 0;
 
 			if (HorizontalOrientation)
 			{
-				x = RowsToPixels(cell.RowIndex.Value) + 1;
+				x = RowsToPixels(cell.RowIndex.Value) + gridWidth;
 				if (x < MaxColumnWidth)
 				{
 					return;
 				}
 
-				w = CellWidth - 1;
-				y = cell.Column!.Left - _vBar.Value + 1;
-				h = cell.Column.ScaledWidth - 1;
+				w = CellWidth - gridWidth;
+				y = cell.Column!.Left - _vBar.Value + gridWidth;
+				h = cell.Column.ScaledWidth - gridWidth;
 			}
 			else
 			{
-				y = RowsToPixels(cell.RowIndex.Value) + 1; // We can't draw without row and column, so assume they exist and fail catastrophically if they don't
+				y = RowsToPixels(cell.RowIndex.Value) + gridWidth; // We can't draw without row and column, so assume they exist and fail catastrophically if they don't
 				if (y < ColumnHeight)
 				{
 					return;
 				}
 
-				x = cell.Column!.Left - _hBar.Value + 1;
-				w = cell.Column.ScaledWidth - 1;
-				h = CellHeight - 1;
+				x = cell.Column!.Left - _hBar.Value + gridWidth;
+				w = cell.Column.ScaledWidth - gridWidth;
+				h = CellHeight - gridWidth;
 			}
 
 			_renderer.SetBrush(color);

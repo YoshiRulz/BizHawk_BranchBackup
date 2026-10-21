@@ -942,7 +942,7 @@ namespace BizHawk.Client.EmuHawk
 			Activate();
 			BringToFront();
 
-			InitializeFpsData();
+			_fpsHistory.Reinit(Stopwatch.GetTimestamp());
 
 			for (; ; )
 			{
@@ -1104,7 +1104,7 @@ namespace BizHawk.Client.EmuHawk
 				if (_emulatorPaused == value) return;
 				if (_emulatorPaused && !value) // Unpausing
 				{
-					InitializeFpsData();
+					_fpsHistory.Reinit(Stopwatch.GetTimestamp());
 				}
 
 				if (value != _emulatorPaused) Tools.OnPauseToggle(value);
@@ -1705,13 +1705,10 @@ namespace BizHawk.Client.EmuHawk
 		private bool _lastFastForwardingOrRewinding;
 		private bool _inResizeLoop;
 
-		private readonly double _fpsUpdatesPerSecond = 4.0;
-		private readonly double _fpsSmoothing = 0.25;
-		private double _lastFps;
-		private int _framesSinceLastFpsUpdate;
-		private long _timestampLastFpsUpdate;
+		private HostFramerateHistory _fpsHistory = new(Stopwatch.Frequency, Stopwatch.GetTimestamp());
 
-		public int GetApproxFramerate() => (int) Math.Round(_lastFps);
+		public int GetApproxFramerate()
+			=> _fpsHistory.ApproxFramerate;
 
 		private readonly Throttle _throttle;
 
@@ -1768,7 +1765,7 @@ namespace BizHawk.Client.EmuHawk
 				if (Config.DispSpeedupFeatures == 0)
 				{
 					// we need to display FPS somewhere, in this case
-					sb.Append($"({_lastFps:0} fps) - ");
+					sb.Append($"({_fpsHistory.ApproxFramerate} fps) - ");
 				}
 
 				if (!Emulator.IsNull())
@@ -2927,7 +2924,7 @@ namespace BizHawk.Client.EmuHawk
 
 				if (isFastForwardingOrRewinding != _lastFastForwardingOrRewinding)
 				{
-					InitializeFpsData();
+					_fpsHistory.Reinit(currentTimestamp);
 				}
 
 				_lastFastForwardingOrRewinding = isFastForwardingOrRewinding;
@@ -3050,7 +3047,7 @@ namespace BizHawk.Client.EmuHawk
 
 				if (newFrame)
 				{
-					_framesSinceLastFpsUpdate++;
+					_fpsHistory.IncrementCounter();
 
 					CalcFramerateAndUpdateDisplay(currentTimestamp, isRewinding, isFastForwarding);
 				}
@@ -3104,29 +3101,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void CalcFramerateAndUpdateDisplay(long currentTimestamp, bool isRewinding, bool isFastForwarding)
 		{
-			double elapsedSeconds = (currentTimestamp - _timestampLastFpsUpdate) / (double)Stopwatch.Frequency;
-
-			if (elapsedSeconds < 1.0 / _fpsUpdatesPerSecond)
-			{
-				return;
-			}
-
-			double rawFps = _framesSinceLastFpsUpdate / elapsedSeconds;
-			double alpha = 1.0 - Math.Exp(-elapsedSeconds/_fpsSmoothing);
-
-			if (_lastFps == 0) // Initial calculation
-			{
-				_lastFps = rawFps;
-			}
-			else
-			{
-				_lastFps = (rawFps * alpha) + (_lastFps * (1.0 - alpha));
-			}
-
-			_framesSinceLastFpsUpdate = 0;
-			_timestampLastFpsUpdate = currentTimestamp;
-
-			var fpsString = $"{_lastFps:F2} fps";
+			if (!_fpsHistory.MaybeRevise(currentTimestamp, out var fpsString)) return;
 			if (isRewinding)
 			{
 				fpsString += IsTurboing || isFastForwarding ?
@@ -3144,13 +3119,6 @@ namespace BizHawk.Client.EmuHawk
 
 			// need to refresh window caption in this case
 			if (Config.DispSpeedupFeatures is 0) UpdateWindowTitle();
-		}
-
-		private void InitializeFpsData()
-		{
-			_lastFps = 0;
-			_timestampLastFpsUpdate = Stopwatch.GetTimestamp();
-			_framesSinceLastFpsUpdate = 0;
 		}
 
 		/// <summary>

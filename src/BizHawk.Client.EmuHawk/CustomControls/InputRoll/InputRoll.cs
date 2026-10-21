@@ -129,6 +129,7 @@ namespace BizHawk.Client.EmuHawk
 			_hBar.ValueChanged += HorizontalBar_ValueChanged;
 
 			RecalculateScrollBars();
+			RepositionScrollbars();
 			_columns.ChangedCallback = ColumnChangedCallback;
 
 			_hoverTimer.Interval = 750;
@@ -649,6 +650,7 @@ namespace BizHawk.Client.EmuHawk
 						_selectedItems.RemoveRange(startIndex, endIndex - startIndex);
 					}
 					_lastSelectedRow = _selectedItems.LastOrDefault()?.RowIndex;
+					InvalidateRow(index);
 				}
 			}
 		}
@@ -665,7 +667,6 @@ namespace BizHawk.Client.EmuHawk
 
 			FullRowSelect = oldFullRowVal;
 			_lastSelectedRow = RowCount;
-			Refresh();
 		}
 
 		public void DeselectAll()
@@ -1391,10 +1392,11 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if (!SuspendHotkeys)
 			{
+				SuspendDrawing(); // prevent any flicker as we deselect rows then select other rows
+
 				if (e.IsPressed(Keys.Escape))
 				{
 					DeselectAll();
-					Refresh();
 				}
 				else if (e.IsCtrlShift(Keys.F))
 				{
@@ -1421,8 +1423,8 @@ namespace BizHawk.Client.EmuHawk
 					else if (FirstVisibleRow > 0)
 					{
 						LastVisibleRow = FirstVisibleRow;
+						Refresh();
 					}
-					Refresh();
 				}
 				else if (e.IsPressed(Keys.PageDown))
 				{
@@ -1444,15 +1446,14 @@ namespace BizHawk.Client.EmuHawk
 					else if (LastVisibleRow < RowCount)
 					{
 						FirstVisibleRow = LastVisibleRow;
+						Refresh();
 					}
-					Refresh();
 				}
 				else if (AllowMassNavigationShortcuts && e.IsPressed(Keys.Home))
 				{
 					DeselectAll();
 					SelectRow(0, true);
 					FirstVisibleRow = 0;
-					Refresh();
 					SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 				}
 				else if (AllowMassNavigationShortcuts && e.IsPressed(Keys.End))
@@ -1460,7 +1461,6 @@ namespace BizHawk.Client.EmuHawk
 					DeselectAll();
 					SelectRow(RowCount - 1, true);
 					LastVisibleRow = RowCount;
-					Refresh();
 					SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 				}
 				else if (e.IsPressed(Keys.Up))
@@ -1474,7 +1474,6 @@ namespace BizHawk.Client.EmuHawk
 							DeselectAll();
 							SelectRow(targetSelectedRow, true);
 							ScrollToIndex(targetSelectedRow);
-							Refresh();
 							SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 						}
 					}
@@ -1490,7 +1489,6 @@ namespace BizHawk.Client.EmuHawk
 							DeselectAll();
 							SelectRow(targetSelectedRow, true);
 							ScrollToIndex(targetSelectedRow);
-							Refresh();
 							SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 						}
 					}
@@ -1509,7 +1507,6 @@ namespace BizHawk.Client.EmuHawk
 							SelectRow(_lastSelectedRow.Value - 1, true);
 						}
 
-						Refresh();
 						SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 					}
 				}
@@ -1531,7 +1528,6 @@ namespace BizHawk.Client.EmuHawk
 							SelectRow(_lastSelectedRow.Value + 1, true);
 						}
 
-						Refresh();
 						SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 					}
 				}
@@ -1546,7 +1542,6 @@ namespace BizHawk.Client.EmuHawk
 							SelectRow(row, false);
 						}
 
-						Refresh();
 						SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 					}
 				}
@@ -1560,7 +1555,6 @@ namespace BizHawk.Client.EmuHawk
 							SelectRow(row, false);
 						}
 
-						Refresh();
 						SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 					}
 				}
@@ -1569,7 +1563,6 @@ namespace BizHawk.Client.EmuHawk
 					if (AnyRowsSelected && LetKeysModifySelection)
 					{
 						SelectRow(SelectedRows.Last(), false);
-						Refresh();
 						SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 					}
 				}
@@ -1578,7 +1571,6 @@ namespace BizHawk.Client.EmuHawk
 					if (AnyRowsSelected && LetKeysModifySelection && SelectedRows.Last() < _rowCount - 1)
 					{
 						SelectRow(SelectedRows.Last() + 1, true);
-						Refresh();
 						SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 					}
 				}
@@ -1587,7 +1579,6 @@ namespace BizHawk.Client.EmuHawk
 					if (AnyRowsSelected && LetKeysModifySelection && FirstSelectedRowIndex > 0)
 					{
 						SelectRow(FirstSelectedRowIndex - 1, true);
-						Refresh();
 						SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 					}
 				}
@@ -1596,7 +1587,6 @@ namespace BizHawk.Client.EmuHawk
 					if (AnyRowsSelected && LetKeysModifySelection)
 					{
 						SelectRow(FirstSelectedRowIndex, false);
-						Refresh();
 						SelectedIndexChanged?.Invoke(this, EventArgs.Empty);
 					}
 				}
@@ -1616,6 +1606,8 @@ namespace BizHawk.Client.EmuHawk
 						//TODO
 					}
 				}
+
+				ResumeDrawing();
 			}
 
 			base.OnKeyDown(e);
@@ -1624,6 +1616,7 @@ namespace BizHawk.Client.EmuHawk
 		protected override void OnResize(EventArgs e)
 		{
 			RecalculateScrollBars();
+			RepositionScrollbars();
 			base.OnResize(e);
 			FastDraw();
 		}
@@ -1666,6 +1659,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void VerticalBar_ValueChanged(object sender, EventArgs e)
 		{
+			_scrollbarVNeedsDraw = true;
 			if (!_programmaticallyUpdatingScrollBarValues)
 			{
 				Refresh();
@@ -1684,6 +1678,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void HorizontalBar_ValueChanged(object sender, EventArgs e)
 		{
+			_scrollbarHNeedsDraw = true;
 			if (!_programmaticallyUpdatingScrollBarValues)
 			{
 				Refresh();
@@ -1829,7 +1824,8 @@ namespace BizHawk.Client.EmuHawk
 				_hBar.Value = 0;
 			}
 
-			RepositionScrollbars();
+			_scrollbarVNeedsDraw = _vBar.Visible;
+			_scrollbarHNeedsDraw = _hBar.Visible;
 		}
 
 		public void RepositionScrollbars()
@@ -1839,6 +1835,9 @@ namespace BizHawk.Client.EmuHawk
 
 			edge = Parent != null ? Math.Min(Height, Parent.Height - Top) : Height;
 			_hBar.Location = new Point(0, Math.Max(edge - _hBar.Height, 0));
+
+			_scrollbarVNeedsDraw = _vBar.Visible;
+			_scrollbarHNeedsDraw = _hBar.Visible;
 		}
 
 		private void UpdateDrawSize()
@@ -1882,6 +1881,7 @@ namespace BizHawk.Client.EmuHawk
 							_lastSelectedRow = row;
 						}
 					}
+					InvalidateRow(row);
 				}
 				else
 				{
@@ -1900,6 +1900,7 @@ namespace BizHawk.Client.EmuHawk
 					{
 						_selectedItems.Add(cell);
 					}
+					InvalidateCell(cell);
 				}
 			}
 			else
